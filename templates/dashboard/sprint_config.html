@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Sprint Configuration{% endblock %}
+{% block content %}
+
+{% set cfg = data.sprint_cfg | default({}) %}
+{% set dor = data.dor | default([]) %}
+
+<div class="page-hd">
+  <h1 class="page-title">Sprint Configuration</h1>
+</div>
+
+{# ── Sprint management ── #}
+<div class="charter-card" style="margin-bottom:20px">
+  <p class="sec-label" style="margin-bottom:14px">Sprints</p>
+
+  <form method="POST" action="{{ url_for('dashboard.sprints_add') }}"
+        style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px">
+    <input name="name" placeholder="Sprint name, e.g. Sprint 1" required
+           style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);
+                  font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface2);min-width:150px" />
+    <input type="date" name="start_date"
+           style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);
+                  font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface2)" />
+    <input type="date" name="end_date"
+           style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);
+                  font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface2)" />
+    <input name="goal" placeholder="Sprint goal (optional)"
+           style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);
+                  border-radius:var(--radius);font-family:var(--font);font-size:13px;
+                  color:var(--text);background:var(--surface2)" />
+    <button type="submit" class="btn-add">+ Create Sprint</button>
+  </form>
+
+  {% if sprints %}
+  <div style="display:flex;flex-direction:column;gap:6px">
+    {% for sp in sprints %}
+    <div style="display:flex;align-items:center;justify-content:space-between;
+                padding:10px 14px;background:var(--surface2);border:1px solid var(--border);
+                border-radius:var(--radius)">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <span style="font-weight:600;font-size:14px">{{ sp.name }}</span>
+        {% if sp.start_date or sp.end_date %}
+        <span style="font-size:12px;color:var(--text-2)">
+          {{ sp.start_date or '—' }} → {{ sp.end_date or '—' }}
+        </span>
+        {% endif %}
+        {% if sp.goal %}
+        <span style="font-size:12px;color:var(--text-2);font-style:italic">{{ sp.goal }}</span>
+        {% endif %}
+      </div>
+      <form method="POST"
+            action="{{ url_for('dashboard.sprints_delete', sprint_id=sp.id) }}">
+        <button type="submit" class="btn-del">Remove</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="font-size:13px;color:var(--text-2)">No sprints yet. Create one above.</p>
+  {% endif %}
+</div>
+
+<form method="POST" action="{{ url_for('dashboard.sprint_config_save') }}">
+
+  {# ── Sprint settings ── #}
+  <div class="charter-card">
+    <p class="sec-label" style="margin-bottom:14px">Sprint Settings</p>
+    <div class="info-grid">
+      <div class="info-card">
+        <label>Sprint Name</label>
+        <input name="name" value="{{ cfg.name or 'Sprint 1' }}" placeholder="e.g. Sprint 1" />
+      </div>
+      <div class="info-card">
+        <label>Start Date</label>
+        <input type="date" name="start_date" value="{{ cfg.start_date or '' }}" />
+      </div>
+      <div class="info-card">
+        <label>End Date</label>
+        <input type="date" name="end_date" value="{{ cfg.end_date or '' }}" />
+      </div>
+      <div class="info-card">
+        <label>Sprint Length</label>
+        <select name="length">
+          {% for w in ["1","2","3","4"] %}
+            <option value="{{ w }}" {% if (cfg.length or "2") == w %}selected{% endif %}>
+              {{ w }} week{{ "s" if w != "1" else "" }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="info-card">
+        <label>Team Velocity (pts)</label>
+        <input name="velocity" value="{{ cfg.velocity or '' }}"
+               placeholder="e.g. 40" type="number" min="0" />
+      </div>
+      <div class="info-card">
+        <label>Team Capacity (%)</label>
+        <input name="capacity" value="{{ cfg.capacity or '' }}"
+               placeholder="e.g. 80" type="number" min="0" max="100" />
+      </div>
+    </div>
+    <div class="info-card">
+      <label>Sprint Goal</label>
+      <input name="goal" value="{{ cfg.goal or '' }}"
+             placeholder="What should this sprint achieve?" />
+    </div>
+  </div>
+
+  {# ── Sprint metrics ── #}
+  {% set todo_pts   = data.kanban.todo   | sum(attribute='pts') %}
+  {% set inprog_pts = data.kanban.inprog | sum(attribute='pts') %}
+  {% set done_pts   = data.kanban.done   | sum(attribute='pts') %}
+  {% set committed  = todo_pts + inprog_pts + done_pts %}
+  {% set total_cards = data.kanban.todo | length + data.kanban.inprog | length + data.kanban.done | length %}
+  {% set done_cards  = data.kanban.done | length %}
+  {% set pct = ((done_cards / (total_cards or 1)) * 100) | round | int %}
+
+  <div class="metrics" style="margin-bottom:16px">
+    <div class="metric">
+      <div class="mlabel">Committed</div>
+      <div class="mval">{{ committed }}<span style="font-size:14px;font-weight:500"> pts</span></div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Done pts</div>
+      <div class="mval" style="color:var(--brand)">{{ done_pts }}<span style="font-size:14px;font-weight:500"> pts</span></div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Cards done</div>
+      <div class="mval">{{ done_cards }}<span style="font-size:14px;font-weight:500">/{{ total_cards }}</span></div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Completion</div>
+      <div class="mval" style="color:var(--brand)">{{ pct }}<span style="font-size:14px;font-weight:500">%</span></div>
+    </div>
+  </div>
+
+  {# ── Definition of Ready ── #}
+  <div class="charter-card">
+    <p class="sec-label" style="margin-bottom:12px">Definition of Ready</p>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:14px">
+      A story is only <strong>READY</strong> for a sprint when these criteria are met.
+    </p>
+
+    {% if dor %}
+    <div class="dod-list" style="margin-bottom:14px">
+      {% for item in dor %}
+      <div style="display:flex;align-items:center;justify-content:space-between;
+                  padding:10px 14px;background:var(--surface2);border:1px solid var(--border);
+                  border-radius:var(--radius);margin-bottom:6px">
+        <span style="font-size:13px;font-weight:500">✓ {{ item.text }}</span>
+        <form method="POST"
+              action="{{ url_for('dashboard.dor_delete', idx=loop.index0) }}"
+              style="display:inline">
+          <button type="submit" class="btn-del">Remove</button>
+        </form>
+      </div>
+      <input type="hidden" name="dor_existing" value="{{ item.text }}" />
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="text" name="dor_text" placeholder="Add a Definition of Ready criterion…"
+             style="flex:1;padding:8px 12px;background:var(--surface2);
+                    border:1px solid var(--border-d);border-radius:var(--radius);
+                    font-family:var(--font);font-size:13px;color:var(--text)" />
+      <button type="submit" class="btn-add" name="_action" value="add_dor">+ Add</button>
+    </div>
+  </div>
+
+  <button type="submit" class="btn-add">Save configuration</button>
+</form>
+{% endblock %}

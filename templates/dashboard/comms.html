@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Communication Plan{% endblock %}
+{% block content %}
+
+<div class="page-hd">
+  <h1 class="page-title">Communication Plan</h1>
+</div>
+
+<form method="POST" action="{{ url_for('dashboard.comms_add') }}" class="add-form">
+  <input class="grow" name="stakeholder" placeholder="Stakeholder / audience" required />
+  <select name="type">
+    <option value="Email">Email</option>
+    <option value="Meeting">Meeting</option>
+    <option value="Report">Report</option>
+    <option value="Call">Call</option>
+    <option value="Presentation">Presentation</option>
+    <option value="Slack">Slack</option>
+  </select>
+  <select name="frequency">
+    <option value="Daily">Daily</option>
+    <option value="Weekly">Weekly</option>
+    <option value="Bi-weekly">Bi-weekly</option>
+    <option value="Monthly">Monthly</option>
+    <option value="As needed">As needed</option>
+    <option value="Milestone">Per milestone</option>
+  </select>
+  <input class="w-md" name="owner" placeholder="Owner" />
+  <input class="grow" name="notes" placeholder="Notes (optional)" />
+  <button type="submit" class="btn-add">+ Add</button>
+</form>
+
+<div class="board-wrap">
+  <div class="group-hd">
+    <span class="group-dot" style="background:#578bfc"></span>
+    Communication entries
+    <span class="group-count">{{ data.comms | default([]) | length }}</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px"></th>
+        <th>Stakeholder</th>
+        <th style="width:140px">Type</th>
+        <th style="width:130px">Frequency</th>
+        <th style="width:140px">Owner</th>
+        <th>Notes</th>
+        <th style="width:90px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data.comms | default([]) %}
+      <tr>
+        <td style="color:var(--subtle);font-size:12px;font-weight:600">{{ loop.index }}</td>
+        <td class="td-title">{{ item.stakeholder }}</td>
+        <td>
+          {% set type_colors = {
+            "Email":        ("#e6f1fb", "#1a5ba8"),
+            "Meeting":      ("#e8faf2", "#047a45"),
+            "Report":       ("#eeedfe", "#534ab7"),
+            "Call":         ("#faeeda", "#ba7517"),
+            "Presentation": ("#fce8eb", "#c8102e"),
+            "Slack":        ("#e4f5ef", "#085041")
+          } %}
+          {% set colors = type_colors.get(item.type, ("#f5f6f8", "#676879")) %}
+          <span style="display:inline-flex;align-items:center;padding:3px 10px;
+                       border-radius:4px;font-size:12px;font-weight:600;
+                       background:{{ colors[0] }};color:{{ colors[1] }}">
+            {{ item.type }}
+          </span>
+        </td>
+        <td>
+          {% if item.frequency == "Daily" %}
+            <span class="pri pri-high">{{ item.frequency }}</span>
+          {% elif item.frequency in ["Weekly", "Bi-weekly"] %}
+            <span class="pri pri-med">{{ item.frequency }}</span>
+          {% else %}
+            <span class="pri pri-low">{{ item.frequency }}</span>
+          {% endif %}
+        </td>
+        <td style="font-size:13px;font-weight:500">{{ item.owner or "—" }}</td>
+        <td style="font-size:13px;color:var(--text-2)">{{ item.notes or "—" }}</td>
+        <td>
+          <form method="POST"
+                action="{{ url_for('dashboard.comms_delete', item_id=item.id) }}">
+            <button type="submit" class="btn-del">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row">
+        <td colspan="7">No communication entries yet — add your first one above.</td>
+      </tr>
+      {% endfor %}
+      <tr class="row-add"><td colspan="7">+ Add entry</td></tr>
+    </tbody>
+  </table>
+</div>
+
+{% if data.comms | default([]) %}
+<div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px">
+  {% set types = data.comms | map(attribute='type') | list %}
+  {% for label, color in [("Email","#1a5ba8"),("Meeting","#047a45"),("Report","#534ab7"),("Call","#ba7517"),("Presentation","#c8102e"),("Slack","#085041")] %}
+  {% set count = types | select("equalto", label) | list | length %}
+  {% if count %}
+  <div class="metric">
+    <div class="mlabel">{{ label }}</div>
+    <div class="mval" style="font-size:24px;color:{{ color }}">{{ count }}</div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

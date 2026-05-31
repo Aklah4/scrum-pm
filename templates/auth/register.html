@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-brand">scrum-pm</div>
+  <h2>Create account</h2>
+  <p class="auth-sub">Set up your Scrum PM workspace</p>
+  {% if error %}<div class="auth-error">{{ error }}</div>{% endif %}
+  <form method="POST">
+    <div class="field">
+      <label>Username</label>
+      <input type="text" name="username" autocomplete="username"
+             placeholder="Choose a username" required />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" autocomplete="new-password"
+             placeholder="Choose a password" required />
+    </div>
+    <div class="field">
+      <label>Confirm password</label>
+      <input type="password" name="confirm" autocomplete="new-password"
+             placeholder="Repeat your password" required />
+    </div>
+    <button type="submit" class="btn-primary">Create account</button>
+  </form>
+  <p class="auth-toggle">
+    Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+  </p>
+</div>
+{% endblock %}

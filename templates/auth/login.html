@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-brand">scrum-pm</div>
+  <h2>Sign in</h2>
+  <p class="auth-sub">Your project data is saved to your account</p>
+  {% if error %}<div class="auth-error">{{ error }}</div>{% endif %}
+  <form method="POST">
+    <div class="field">
+      <label>Username</label>
+      <input type="text" name="username" autocomplete="username"
+             placeholder="Enter your username" required />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" autocomplete="current-password"
+             placeholder="Enter your password" required />
+    </div>
+    <button type="submit" class="btn-primary">Sign in</button>
+  </form>
+  <p class="auth-toggle">
+    No account? <a href="{{ url_for('auth.register') }}">Register here</a>
+  </p>
+</div>
+{% endblock %}

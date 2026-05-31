@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+{% block title %}Backlog{% endblock %}
+{% block content %}
+
+{% set col_count = 6 if sprints else 5 %}
+
+<div class="page-hd">
+  <h1 class="page-title">Product Backlog</h1>
+  <div class="toolbar">
+    <button class="btn-new" type="button"
+            onclick="focusAddForm('story-title')">+ New story</button>
+    <button class="toolbar-btn">⊞ Filter</button>
+    <button class="toolbar-btn">↕ Sort</button>
+    <button class="toolbar-btn">⊟ Group by</button>
+  </div>
+</div>
+
+{# ── Sprint filter pills ── #}
+{% if sprints %}
+<div class="sprint-filter-bar">
+  <a href="{{ url_for('dashboard.backlog') }}"
+     class="sprint-pill{% if not sprint_filter %} active{% endif %}">
+    All <span class="pill-count">{{ data.stories | length }}</span>
+  </a>
+  {% for sp in sprints %}
+  <a href="{{ url_for('dashboard.backlog', sprint=sp.id) }}"
+     class="sprint-pill{% if sprint_filter == sp.id %} active{% endif %}">
+    {{ sp.name }} <span class="pill-count">{{ sprint_counts.get(sp.id, 0) }}</span>
+  </a>
+  {% endfor %}
+  <a href="{{ url_for('dashboard.backlog', sprint='__none__') }}"
+     class="sprint-pill{% if sprint_filter == '__none__' %} active{% endif %}">
+    Unassigned <span class="pill-count">{{ sprint_counts.get('', 0) }}</span>
+  </a>
+</div>
+{% endif %}
+
+{# ── Add story form ── #}
+<form method="POST" action="{{ url_for('dashboard.backlog_add') }}" class="add-form">
+  <input id="story-title" class="grow" name="title"
+         placeholder="As a [user], I want to [action] so that [benefit]" required />
+  <select name="priority">
+    <option value="high">High</option>
+    <option value="med" selected>Medium</option>
+    <option value="low">Low</option>
+  </select>
+  {% if sprints %}
+  <select name="sprint_id">
+    <option value="">— Sprint —</option>
+    {% for sp in sprints %}
+    <option value="{{ sp.id }}">{{ sp.name }}</option>
+    {% endfor %}
+  </select>
+  {% endif %}
+  <input class="w-sm" type="number" name="pts" placeholder="pts" min="1" max="21" />
+  <button type="submit" class="btn-add">+ Add</button>
+</form>
+
+{# ── Story table ── #}
+<div class="board-wrap">
+  <div class="group-hd">
+    <span class="group-dot" style="background:var(--brand)"></span>
+    {% if sprint_filter == '__none__' %}
+      Unassigned stories
+    {% elif sprint_filter %}
+      {% for sp in sprints %}{% if sp.id == sprint_filter %}{{ sp.name }}{% endif %}{% endfor %}
+    {% else %}
+      All stories
+    {% endif %}
+    <span class="group-count">{{ filtered_stories | length }}</span>
+    {% if sprint_filter %}
+    <span style="font-size:12px;color:var(--text-2);margin-left:4px">of {{ data.stories | length }} total</span>
+    {% endif %}
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px"></th>
+        <th>Story</th>
+        <th style="width:130px">Priority</th>
+        {% if sprints %}<th style="width:150px">Sprint</th>{% endif %}
+        <th style="width:90px">Points</th>
+        <th style="width:120px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for story in filtered_stories %}
+      {% set story_tasks = story.tasks | default([]) %}
+      {% set tasks_done  = story_tasks | selectattr('done') | list | length %}
+      <tr>
+        <td>
+          <button type="button" class="expand-btn"
+                  onclick="toggleTasks('{{ story.id }}')">
+            <span id="chv-{{ story.id }}">▶</span>
+          </button>
+        </td>
+        <td class="td-title">
+          {{ story.title }}
+          {% if story_tasks %}
+          <span class="task-chip {% if tasks_done == story_tasks|length %}task-chip-done{% endif %}">
+            {{ tasks_done }}/{{ story_tasks|length }}
+          </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if story.priority == "high" %}
+            <span class="pri pri-high">● High</span>
+          {% elif story.priority == "med" %}
+            <span class="pri pri-med">● Medium</span>
+          {% else %}
+            <span class="pri pri-low">● Low</span>
+          {% endif %}
+        </td>
+        {% if sprints %}
+        <td>
+          <form method="POST"
+                action="{{ url_for('dashboard.backlog_assign', story_id=story.id) }}">
+            <select name="sprint_id" class="sprint-inline-select"
+                    onchange="this.form.submit()">
+              <option value="">— Unassigned —</option>
+              {% for sp in sprints %}
+              <option value="{{ sp.id }}"
+                      {% if story.sprint_id == sp.id %}selected{% endif %}>
+                {{ sp.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </form>
+        </td>
+        {% endif %}
+        <td><span class="pts-badge">{{ story.pts }} pts</span></td>
+        <td style="display:flex;gap:6px;align-items:center">
+          <button type="button" class="btn-edit"
+                  onclick="openEdit('{{ story.id }}','{{ story.title | replace("'", "\\'") }}','{{ story.priority }}','{{ story.pts }}','{{ story.sprint_id or "" }}')">Edit</button>
+          <form method="POST"
+                action="{{ url_for('dashboard.backlog_delete', story_id=story.id) }}">
+            <button type="submit" class="btn-del">Remove</button>
+          </form>
+        </td>
+      </tr>
+      <tr class="tasks-sub-row" id="tasks-row-{{ story.id }}" style="display:none">
+        <td colspan="{{ col_count }}" class="tasks-sub-cell">
+          <div class="tasks-panel">
+            {% for task in story_tasks %}
+            <div class="task-item">
+              <form method="POST"
+                    action="{{ url_for('dashboard.task_toggle', story_id=story.id, task_id=task.id) }}">
+                <button type="submit" class="task-check-btn{% if task.done %} checked{% endif %}">
+                  {% if task.done %}✓{% endif %}
+                </button>
+              </form>
+              <span class="task-text{% if task.done %} task-struck{% endif %}">{{ task.text }}</span>
+              <form method="POST"
+                    action="{{ url_for('dashboard.task_delete', story_id=story.id, task_id=task.id) }}">
+                <button type="submit" class="task-x-btn">×</button>
+              </form>
+            </div>
+            {% endfor %}
+            <form method="POST"
+                  action="{{ url_for('dashboard.task_add', story_id=story.id) }}"
+                  class="task-add-inline">
+              <input name="text" placeholder="Add a task, e.g. Set up navbar component" required />
+              <button type="submit" class="btn-add">+ Add task</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row">
+        <td colspan="{{ col_count }}">
+          {% if sprint_filter %}No stories in this view.{% else %}No stories yet — add your first user story above.{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      <tr class="row-add"><td colspan="{{ col_count }}">+ Add story</td></tr>
+    </tbody>
+  </table>
+</div>
+
+{# ── Edit modal ── #}
+<div id="edit-overlay" class="edit-overlay" onclick="closeEdit(event)">
+  <div class="edit-modal">
+    <h3 class="edit-modal-title">Edit Story</h3>
+    <form id="edit-form" method="POST">
+      <label class="edit-label">Story title</label>
+      <textarea id="edit-title" name="title" class="edit-textarea" rows="3" required></textarea>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Priority</label>
+          <select id="edit-priority" name="priority" class="edit-select">
+            <option value="high">High</option>
+            <option value="med">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        {% if sprints %}
+        <div class="edit-field">
+          <label class="edit-label">Sprint</label>
+          <select id="edit-sprint" name="sprint_id" class="edit-select">
+            <option value="">Unassigned</option>
+            {% for sp in sprints %}
+            <option value="{{ sp.id }}">{{ sp.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <div class="edit-field">
+          <label class="edit-label">Points</label>
+          <input id="edit-pts" name="pts" type="number" min="1" max="21" class="edit-input" />
+        </div>
+      </div>
+      <div class="edit-actions">
+        <button type="button" class="btn-cancel" onclick="closeEditDirect()">Cancel</button>
+        <button type="submit" class="btn-save">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+/* Sprint filter pills */
+.sprint-filter-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.sprint-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border, #e0e0e0);
+  font-size: 13px;
+  color: var(--fg, #333);
+  text-decoration: none;
+  background: none;
+  transition: background .12s, border-color .12s;
+}
+.sprint-pill:hover { background: var(--hover-bg, #f5f5f5); }
+.sprint-pill.active {
+  background: var(--brand, #0052cc);
+  border-color: var(--brand, #0052cc);
+  color: #fff;
+}
+.pill-count {
+  font-size: 11px;
+  background: rgba(0,0,0,.1);
+  border-radius: 10px;
+  padding: 1px 6px;
+}
+.sprint-pill.active .pill-count { background: rgba(255,255,255,.2); }
+
+/* Inline sprint dropdown in table */
+.sprint-inline-select {
+  padding: 4px 6px;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--fg, #111);
+  background: var(--input-bg, #fff);
+  cursor: pointer;
+  max-width: 140px;
+  width: 100%;
+}
+.sprint-inline-select:focus {
+  outline: none;
+  border-color: var(--brand, #0052cc);
+}
+
+/* Expand toggle */
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-2, #aaa);
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.expand-btn:hover { color: var(--fg, #333); background: var(--hover-bg, #f5f5f5); }
+
+/* Task count chip on story title */
+.task-chip {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--surface2, #f0f0f0);
+  color: var(--text-2, #888);
+  border: 1px solid var(--border, #e0e0e0);
+  vertical-align: middle;
+}
+.task-chip-done {
+  background: #e6f9f0;
+  color: #1a7a4a;
+  border-color: #b3e8cc;
+}
+
+/* Sub-row */
+.tasks-sub-cell { padding: 0 !important; border-top: none !important; }
+.tasks-panel {
+  padding: 12px 16px 14px 48px;
+  background: #1e1e1e;
+  border-top: 1px dashed #3a3a3a;
+}
+
+/* Individual task item */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+.task-check-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 4px;
+  border: 2px solid #ffffff;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: background .12s, border-color .12s;
+}
+.task-check-btn:hover { background: rgba(255,255,255,0.15); }
+.task-check-btn.checked {
+  background: var(--brand, #1D9E75);
+  border-color: var(--brand, #1D9E75);
+  color: #fff !important;
+}
+.tasks-panel .task-text { font-size: 13px; flex: 1; color: #ffffff; }
+.tasks-panel .task-struck { text-decoration: line-through; color: rgba(255,255,255,0.4); }
+.task-x-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,0.4);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.task-x-btn:hover { color: #e2445c; }
+
+/* Add task inline form */
+.task-add-inline {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.tasks-panel .task-add-inline input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #ffffff;
+  background: rgba(255,255,255,0.08);
+}
+.tasks-panel .task-add-inline input::placeholder { color: rgba(255,255,255,0.4); }
+
+/* Edit button */
+.btn-edit {
+  background: none;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--fg, #333);
+  white-space: nowrap;
+}
+.btn-edit:hover { background: var(--hover-bg, #f5f5f5); }
+
+/* Edit modal */
+.edit-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.edit-overlay.open { display: flex; }
+.edit-modal {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  padding: 28px 32px;
+  width: min(580px, 95vw);
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+}
+.edit-modal-title {
+  margin: 0 0 18px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg, #111);
+}
+.edit-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-muted, #666);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.edit-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--fg, #111);
+  background: var(--input-bg, #fff);
+  resize: vertical;
+  margin-bottom: 16px;
+}
+.edit-row { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+.edit-field { flex: 1; min-width: 120px; }
+.edit-select, .edit-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--fg, #111);
+  background: var(--input-bg, #fff);
+}
+.edit-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.btn-cancel {
+  background: none;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--fg, #333);
+}
+.btn-cancel:hover { background: var(--hover-bg, #f5f5f5); }
+.btn-save {
+  background: var(--brand, #0052cc);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+}
+.btn-save:hover { opacity: .88; }
+</style>
+
+<script>
+function toggleTasks(storyId) {
+  var row = document.getElementById('tasks-row-' + storyId);
+  var chv = document.getElementById('chv-' + storyId);
+  var opening = row.style.display === 'none';
+  row.style.display = opening ? 'table-row' : 'none';
+  chv.textContent   = opening ? '▼' : '▶';
+  var open = JSON.parse(localStorage.getItem('openTaskRows') || '{}');
+  if (opening) open[storyId] = true; else delete open[storyId];
+  localStorage.setItem('openTaskRows', JSON.stringify(open));
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var open = JSON.parse(localStorage.getItem('openTaskRows') || '{}');
+  Object.keys(open).forEach(function(id) {
+    var row = document.getElementById('tasks-row-' + id);
+    var chv = document.getElementById('chv-' + id);
+    if (row) row.style.display = 'table-row';
+    if (chv) chv.textContent = '▼';
+  });
+});
+
+function openEdit(id, title, priority, pts, sprintId) {
+  document.getElementById('edit-form').action = '/backlog/edit/' + id;
+  document.getElementById('edit-title').value = title;
+  document.getElementById('edit-priority').value = priority;
+  document.getElementById('edit-pts').value = pts;
+  var spSelect = document.getElementById('edit-sprint');
+  if (spSelect) spSelect.value = sprintId || '';
+  document.getElementById('edit-overlay').classList.add('open');
+}
+function closeEdit(e) {
+  if (e.target === document.getElementById('edit-overlay')) closeEditDirect();
+}
+function closeEditDirect() {
+  document.getElementById('edit-overlay').classList.remove('open');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeEditDirect();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}My Projects{% endblock %}
+{% block content %}
+
+<div class="projects-page">
+
+  {# ── Page heading ── #}
+  <div class="projects-header">
+    <h1 class="page-title">My Projects</h1>
+    <p class="projects-sub">Select a project to open it, or create a new one below.</p>
+  </div>
+
+  {# ── Create form (top, centered) ── #}
+  <div class="create-card">
+    <p class="sec-label" style="margin-bottom:16px">New project</p>
+    <form method="POST" action="{{ url_for('dashboard.projects_create') }}"
+          class="create-form">
+      <div class="field" style="margin:0;flex:1;min-width:180px">
+        <label>Project name</label>
+        <input type="text" name="project_name"
+               placeholder="e.g. Client Portal v2" required />
+      </div>
+      <div class="field" style="margin:0;flex:1;min-width:140px">
+        <label>Project manager</label>
+        <input type="text" name="pm" placeholder="e.g. Emmanuel" />
+      </div>
+      <div style="padding-top:20px">
+        <button type="submit" class="btn-add">+ Create project</button>
+      </div>
+    </form>
+  </div>
+
+  {# ── Project list (below, centered) ── #}
+  {% if projects %}
+  <div class="projects-list-header">
+    <span class="sec-label" style="margin:0">All projects</span>
+    <span class="group-count">{{ projects | length }}</span>
+  </div>
+
+  <div class="project-list">
+    {% for p in projects %}
+    {% set is_active = (p.project_id == session.get('project_id')) %}
+    <div class="project-card {% if is_active %}active-project{% endif %}">
+
+      <div class="project-stripe {% if is_active %}stripe-active{% endif %}"></div>
+
+      <div class="project-card-body">
+        <div class="project-card-name">{{ p.project.name or "Untitled Project" }}</div>
+        <div class="project-card-meta">
+          {% if p.project.pm %}
+            <span class="meta-chip">👤 {{ p.project.pm }}</span>
+          {% endif %}
+          <span class="meta-chip">📋 {{ p.stories | length }} stor{{ "ies" if p.stories | length != 1 else "y" }}</span>
+          <span class="meta-chip">👥 {{ p.team | length }} member{{ "s" if p.team | length != 1 else "" }}</span>
+          <span class="meta-chip">⚠ {{ p.risks | length }} risk{{ "s" if p.risks | length != 1 else "" }}</span>
+        </div>
+      </div>
+
+      <div class="project-card-actions">
+        {% if is_active %}
+          <span class="proj-badge-active">● Active</span>
+          <a href="{{ url_for('dashboard.overview') }}" class="btn-add">Open →</a>
+        {% else %}
+          <form method="POST"
+                action="{{ url_for('dashboard.projects_switch', project_id=p.project_id) }}">
+            <button type="submit" class="btn-switch">Switch →</button>
+          </form>
+        {% endif %}
+        <form method="POST"
+              action="{{ url_for('dashboard.projects_delete', project_id=p.project_id) }}"
+              onsubmit="return confirm('Delete \'{{ p.project.name or 'this project' }}\'? This cannot be undone.')">
+          <button type="submit" class="btn-del">× Delete</button>
+        </form>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="projects-empty">
+    <div class="projects-empty-icon">📁</div>
+    <div class="projects-empty-text">No projects yet</div>
+    <div class="projects-empty-sub">Create your first project using the form above.</div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

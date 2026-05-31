@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Team{% endblock %}
+{% block content %}
+
+{% set avatar_colors = [
+  ('#9FE1CB','#085041'),
+  ('#CECBF6','#3C3489'),
+  ('#FAC775','#633806'),
+  ('#F4C0D1','#72243E'),
+  ('#B5D4F4','#0C447C'),
+  ('#C0DD97','#27500A')
+] %}
+
+<div class="page-hd">
+  <h1 class="page-title">Scrum Team</h1>
+</div>
+
+<div class="board-wrap" style="margin-bottom:20px">
+  <div class="group-hd">
+    <span class="group-dot" style="background:var(--status-purple)"></span>
+    Team members
+    <span class="group-count">{{ data.team | length }}</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">Avatar</th>
+        <th>Name</th>
+        <th style="width:180px">Role</th>
+        <th style="width:160px">Capacity</th>
+        <th style="width:90px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for member in data.team %}
+      {% set colors = avatar_colors[loop.index0 % (avatar_colors | length)] %}
+      {% set capacity = ((member.name | length * 7) % 40) + 60 %}
+      <tr>
+        <td>
+          <div class="avatar"
+               style="background:{{ colors[0] }};color:{{ colors[1] }};
+                      width:34px;height:34px;font-size:12px;margin:0">
+            {{ member.name[:2] | upper }}
+          </div>
+        </td>
+        <td class="td-title">{{ member.name }}</td>
+        <td>
+          <span style="display:inline-flex;align-items:center;padding:3px 10px;
+                       border-radius:4px;font-size:12px;font-weight:600;
+                       background:#eeedfe;color:#534ab7">
+            {{ member.role }}
+          </span>
+        </td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="capacity-bar-wrap" style="flex:1">
+              <div class="capacity-bar" style="width:{{ capacity }}%"></div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--text-2);width:34px">
+              {{ capacity }}%
+            </span>
+          </div>
+        </td>
+        <td>
+          <form method="POST"
+                action="{{ url_for('dashboard.team_delete', member_id=member.id) }}">
+            <button type="submit" class="btn-del">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row"><td colspan="5">No team members yet.</td></tr>
+      {% endfor %}
+      <tr class="row-add"><td colspan="5">+ Add member</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<form method="POST" action="{{ url_for('dashboard.team_add') }}" class="add-form">
+  <input class="grow" name="name" placeholder="Full name" required />
+  <select name="role">
+    <option>Product Owner</option>
+    <option>Scrum Master</option>
+    <option>Developer</option>
+    <option>QA Engineer</option>
+    <option>UX Designer</option>
+    <option>DevOps</option>
+    <option>Tech Lead</option>
+  </select>
+  <button type="submit" class="btn-add">+ Add member</button>
+</form>
+{% endblock %}

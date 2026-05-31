@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Retrospective{% endblock %}
+{% block content %}
+
+<div class="page-hd">
+  <h1 class="page-title">Sprint Retrospective</h1>
+</div>
+
+<div class="retro-cols">
+  {% for col, label, cls in [
+      ("went",    "What went well",  "went-well"),
+      ("improve", "What to improve", "improve"),
+      ("action",  "Action items",    "action")
+  ] %}
+  <div class="retro-col {{ cls }}">
+    <h4>{{ label }}</h4>
+
+    {% for item in data.retro[col] %}
+    <div class="retro-item">
+      <span>{{ item.text }}</span>
+      <form method="POST"
+            action="{{ url_for('dashboard.retro_delete', col=col, item_id=item.id) }}"
+            style="display:inline;flex-shrink:0">
+        <button type="submit" class="btn-x">×</button>
+      </form>
+    </div>
+    {% endfor %}
+
+    <form method="POST"
+          action="{{ url_for('dashboard.retro_add', col=col) }}"
+          class="retro-form">
+      <input type="text" name="text" placeholder="Add item…" required />
+      <button type="submit" class="btn-add" style="padding:7px 12px">+</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

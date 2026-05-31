@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Risks{% endblock %}
+{% block content %}
+
+<div class="page-hd">
+  <h1 class="page-title">Risk Register</h1>
+</div>
+
+<form method="POST" action="{{ url_for('dashboard.risks_add') }}" class="add-form">
+  <input class="grow" name="title" placeholder="Risk description" required />
+  <select name="level">
+    <option value="high">High</option>
+    <option value="med" selected>Medium</option>
+    <option value="low">Low</option>
+  </select>
+  <input class="grow" name="mitigation" placeholder="Mitigation strategy…" />
+  <button type="submit" class="btn-add">+ Add risk</button>
+</form>
+
+<div class="board-wrap">
+  <div class="group-hd">
+    <span class="group-dot" style="background:#e2445c"></span>
+    All risks
+    <span class="group-count">{{ data.risks | length }}</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px"></th>
+        <th>Risk</th>
+        <th style="width:120px">Level</th>
+        <th>Mitigation</th>
+        <th style="width:90px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for risk in data.risks %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td class="td-title">{{ risk.title }}</td>
+        <td>
+          {% if risk.level == "high" %}
+            <span class="pri pri-high">● High</span>
+          {% elif risk.level == "med" %}
+            <span class="pri pri-med">● Medium</span>
+          {% else %}
+            <span class="pri pri-low">● Low</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--text-2);font-size:13px">{{ risk.mitigation or "—" }}</td>
+        <td>
+          <form method="POST"
+                action="{{ url_for('dashboard.risks_delete', risk_id=risk.id) }}">
+            <button type="submit" class="btn-del">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row"><td colspan="5">No risks logged yet.</td></tr>
+      {% endfor %}
+      <tr class="row-add"><td colspan="5">+ Add risk</td></tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

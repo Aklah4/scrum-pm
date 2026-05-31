@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+
+<div class="page-hd">
+  <h1 class="page-title">High-level project overview</h1>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="mlabel">Stories</div>
+    <div class="mval">{{ data.stories | length }}</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">Team size</div>
+    <div class="mval">{{ data.team | length }}</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">High risks</div>
+    <div class="mval">{{ data.risks | selectattr("level","equalto","high") | list | length }}</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">Done cards</div>
+    <div class="mval">{{ data.kanban.done | length }}</div>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('dashboard.overview_save') }}">
+
+  <div class="charter-card">
+    <p class="sec-label" style="margin-bottom:14px">Project Charter</p>
+    <div class="info-grid">
+      <div class="info-card">
+        <label>Project Name</label>
+        <input name="name" value="{{ data.project.name }}" placeholder="e.g. Client Portal v2" />
+      </div>
+      <div class="info-card">
+        <label>Client</label>
+        <input name="client" value="{{ data.project.client }}" placeholder="e.g. Acme Corp" />
+      </div>
+      <div class="info-card">
+        <label>Project Manager</label>
+        <input name="pm" value="{{ data.project.pm }}" placeholder="Your name" />
+      </div>
+      <div class="info-card">
+        <label>Start Date</label>
+        <input type="date" name="start" value="{{ data.project.start }}" />
+      </div>
+      <div class="info-card">
+        <label>Target End Date</label>
+        <input type="date" name="end" value="{{ data.project.end }}" />
+      </div>
+      <div class="info-card">
+        <label>Sprint Length</label>
+        <select name="sprint_len">
+          {% for w in ["1","2","3","4"] %}
+            <option value="{{ w }}" {% if data.project.sprint_len == w %}selected{% endif %}>
+              {{ w }} week{{ "s" if w != "1" else "" }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="info-card">
+      <label>Project Goal</label>
+      <input name="goal" value="{{ data.project.goal }}"
+             placeholder="e.g. Deliver a scalable portal that reduces support tickets by 40%" />
+    </div>
+  </div>
+
+  <div class="charter-card">
+    <p class="sec-label" style="margin-bottom:12px">Project Phases</p>
+    <div class="phase-row" style="margin-bottom:16px">
+      {% for phase in data.phases %}
+        <input type="hidden" name="phase_label" value="{{ phase.label }}" />
+        <button type="button" class="phase {{ phase.state }}"
+                data-label="{{ phase.label }}" onclick="cyclePhase(this)">
+          {{ phase.label }}
+        </button>
+        <input type="hidden" name="phase_state_{{ phase.label }}"
+               id="state_{{ phase.label }}" value="{{ phase.state }}" />
+      {% endfor %}
+    </div>
+
+    {% set done_count = data.phases | selectattr("state","equalto","done") | list | length %}
+    {% set total = data.phases | length %}
+    {% set pct = ((done_count / (total or 1)) * 100) | round | int %}
+    <p class="sec-label" style="margin-top:4px">Overall Progress</p>
+    <div class="progress-section" style="margin-top:8px">
+      <div class="progress-meta">
+        <span>Phases complete</span>
+        <span class="pct">{{ pct }}%</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" style="width:{{ pct }}%"></div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn-add">Save overview</button>
+</form>
+{% endblock %}

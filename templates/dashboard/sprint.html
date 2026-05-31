@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% block title %}Sprint{% endblock %}
+{% block content %}
+
+{% if not sprints %}
+
+<div class="page-hd">
+  <h1 class="page-title">Sprint Board</h1>
+</div>
+<div class="empty-state-box">
+  No sprints yet. Go to
+  <a href="{{ url_for('dashboard.backlog') }}">Backlog</a>,
+  click <strong>⚡ Sprints</strong> to create a sprint, then assign stories to it.
+</div>
+
+{% else %}
+
+{# ── Sprint selector tabs ── #}
+{% if sprints | length > 1 %}
+<div class="sprint-tabs">
+  {% for sp in sprints %}
+  <a href="{{ url_for('dashboard.sprint', sprint=sp.id) }}"
+     class="sprint-tab{% if sprint_id == sp.id %} active{% endif %}">
+    {{ sp.name }}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ── Sprint header ── #}
+{% set todo_pts   = kanban.todo   | sum(attribute='pts') %}
+{% set inprog_pts = kanban.inprog | sum(attribute='pts') %}
+{% set done_pts   = kanban.done   | sum(attribute='pts') %}
+{% set committed  = todo_pts + inprog_pts + done_pts %}
+{% set total_stories = kanban.todo | length + kanban.inprog | length + kanban.done | length %}
+{% set done_count    = kanban.done | length %}
+{% set pct = ((done_count / (total_stories or 1)) * 100) | round | int %}
+
+<div class="sprint-hd">
+  <div>
+    <h1 class="page-title">
+      {{ current_sprint.name if current_sprint else 'Sprint Board' }}
+    </h1>
+    {% if current_sprint %}
+    <div class="sprint-meta-row">
+      {% if current_sprint.start_date or current_sprint.end_date %}
+      <span class="sprint-meta-item">
+        📅 {{ current_sprint.start_date or '—' }} → {{ current_sprint.end_date or '—' }}
+      </span>
+      {% endif %}
+      {% if current_sprint.goal %}
+      <span class="sprint-meta-item sprint-goal-chip">
+        🎯 {{ current_sprint.goal }}
+      </span>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="sprint-stats">
+    <span class="sprint-stat">Committed <strong>{{ committed }} pts</strong></span>
+    <span class="sprint-stat">Done <strong>{{ done_pts }} pts</strong></span>
+    <span class="sprint-stat">Velocity <strong>{{ done_pts }} pts</strong></span>
+  </div>
+</div>
+
+{# ── Progress bar ── #}
+<div class="sprint-progress">
+  <div class="progress-meta">
+    <span>Sprint progress — {{ done_count }} of {{ total_stories }}
+      stor{{ "ies" if total_stories != 1 else "y" }} done</span>
+    <span class="pct">{{ pct }}%</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" style="width:{{ pct }}%"></div>
+  </div>
+</div>
+
+{# ── Empty sprint hint ── #}
+{% if total_stories == 0 %}
+<div class="empty-state-box">
+  No stories assigned to
+  <strong>{{ current_sprint.name if current_sprint else 'this sprint' }}</strong>.
+  Go to <a href="{{ url_for('dashboard.backlog') }}">Backlog</a>,
+  edit a story and set its sprint to
+  <strong>{{ current_sprint.name if current_sprint else 'this sprint' }}</strong>.
+</div>
+{% endif %}
+
+{# ── Kanban board ── #}
+<div class="kanban">
+  {% for col, label, dot_color in [
+      ("todo",   "To Do",       "#c4c4c4"),
+      ("inprog", "In Progress", "#fdab3d"),
+      ("done",   "Done",        "#00c875")
+  ] %}
+  <div class="kcol">
+    <div class="kcol-hd">
+      <span>
+        <span class="kcol-dot" style="background:{{ dot_color }}"></span>
+        {{ label }}
+      </span>
+      <span class="kcount">{{ kanban[col] | length }}</span>
+    </div>
+
+    {% for story in kanban[col] %}
+    {% set stasks     = story.tasks | default([]) %}
+    {% set stasks_done = stasks | selectattr('done') | list | length %}
+    <div class="kcard">
+      <div class="kcard-title">{{ story.title }}</div>
+
+      {% if stasks %}
+      <div class="kcard-task-row">
+        <div class="kcard-task-bar">
+          <div class="kcard-task-fill"
+               style="width:{{ ((stasks_done / stasks|length) * 100)|int }}%"></div>
+        </div>
+        <button type="button" class="kcard-tasks-toggle"
+                onclick="toggleKTasks('{{ story.id }}')">
+          {{ stasks_done }}/{{ stasks|length }} tasks
+        </button>
+      </div>
+      <div id="ktasks-{{ story.id }}" class="kcard-tasks" style="display:none">
+        {% for task in stasks %}
+        <form method="POST"
+              action="{{ url_for('dashboard.task_toggle', story_id=story.id, task_id=task.id) }}"
+              class="ktask-form">
+          <input type="hidden" name="next"
+                 value="{{ url_for('dashboard.sprint', sprint=sprint_id) }}" />
+          <button type="submit" class="ktask-btn">
+            <span class="ktask-check{% if task.done %} ktask-checked{% endif %}">
+              {% if task.done %}✓{% else %}○{% endif %}
+            </span>
+            <span class="{% if task.done %}task-struck{% endif %}">{{ task.text }}</span>
+          </button>
+        </form>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="kcard-meta">
+        {% if story.priority == "high" %}
+          <span class="pri pri-high" style="font-size:11px">● High</span>
+        {% elif story.priority == "med" %}
+          <span class="pri pri-med" style="font-size:11px">● Med</span>
+        {% else %}
+          <span class="pri pri-low" style="font-size:11px">● Low</span>
+        {% endif %}
+        <span class="pts-badge">{{ story.pts }} pts</span>
+
+        {% if col != "todo" %}
+        <form method="POST"
+              action="{{ url_for('dashboard.sprint_story_back', story_id=story.id) }}"
+              style="display:inline">
+          <input type="hidden" name="sprint_id" value="{{ sprint_id }}" />
+          <button type="submit" class="btn-back">← back</button>
+        </form>
+        {% endif %}
+
+        {% if col != "done" %}
+        <form method="POST"
+              action="{{ url_for('dashboard.sprint_story_move', story_id=story.id) }}"
+              style="display:inline">
+          <input type="hidden" name="sprint_id" value="{{ sprint_id }}" />
+          <button type="submit" class="btn-move">→ move</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <p class="empty-col">No items</p>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endif %}
+
+<style>
+.sprint-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border, #e0e0e0);
+}
+.sprint-tab {
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2, #888);
+  text-decoration: none;
+  border-radius: 6px 6px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  margin-bottom: -2px;
+  transition: color .12s, background .12s;
+}
+.sprint-tab:hover { color: var(--fg, #111); background: var(--hover-bg, #f5f5f5); }
+.sprint-tab.active {
+  color: var(--fg, #111);
+  font-weight: 600;
+  background: var(--bg, #fff);
+  border-color: var(--border, #e0e0e0);
+  border-bottom-color: var(--bg, #fff);
+}
+
+.sprint-meta-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+.sprint-meta-item {
+  font-size: 13px;
+  color: var(--text-2, #888);
+}
+.sprint-goal-chip {
+  font-style: italic;
+}
+
+/* Task progress bar on kanban card */
+.kcard-task-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 4px;
+}
+.kcard-task-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border, #e0e0e0);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.kcard-task-fill {
+  height: 100%;
+  background: var(--brand, #0052cc);
+  border-radius: 2px;
+  transition: width .2s;
+}
+.kcard-tasks-toggle {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: var(--text-2, #888);
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0;
+}
+.kcard-tasks-toggle:hover { color: var(--fg, #333); }
+
+/* Task checklist on kanban card */
+.kcard-tasks { margin: 4px 0 8px; }
+.ktask-form { display: block; }
+.ktask-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 3px 0;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--fg, #111);
+  text-align: left;
+}
+.ktask-btn:hover { color: var(--brand, #0052cc); }
+.ktask-check {
+  font-size: 13px;
+  color: var(--text-2, #aaa);
+  min-width: 14px;
+}
+.ktask-checked { color: var(--brand, #0052cc); }
+.task-struck { text-decoration: line-through; color: var(--text-2, #aaa); }
+
+.empty-state-box {
+  padding: 28px 32px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-2, #888);
+  background: var(--surface2, #f9f9f9);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  margin: 16px 0;
+  line-height: 1.7;
+}
+.empty-state-box a { color: var(--brand, #0052cc); font-weight: 500; }
+</style>
+
+<script>
+function toggleKTasks(storyId) {
+  var el = document.getElementById('ktasks-' + storyId);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

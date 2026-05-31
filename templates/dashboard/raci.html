@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}RACI Matrix{% endblock %}
+{% block content %}
+
+<div class="page-hd">
+  <h1 class="page-title">Roles &amp; Responsibility (RACI)</h1>
+</div>
+
+<div class="charter-card" style="margin-bottom:16px">
+  <p class="sec-label" style="margin-bottom:8px">RACI Legend</p>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <span><strong style="color:var(--pri-high-bg)">R</strong> <span style="font-size:13px;color:var(--text-2)">— Responsible: does the work</span></span>
+    <span><strong style="color:var(--pri-med-bg)">A</strong> <span style="font-size:13px;color:var(--text-2)">— Accountable: ultimately answerable</span></span>
+    <span><strong style="color:var(--brand)">C</strong> <span style="font-size:13px;color:var(--text-2)">— Consulted: provides input</span></span>
+    <span><strong style="color:var(--pri-low-bg)">I</strong> <span style="font-size:13px;color:var(--text-2)">— Informed: kept up to date</span></span>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('dashboard.raci_add') }}" class="add-form">
+  <input class="grow" name="activity"    placeholder="Activity / task" required />
+  <input class="w-md" name="responsible" placeholder="Responsible (R)" />
+  <input class="w-md" name="accountable" placeholder="Accountable (A)" />
+  <input class="w-md" name="consulted"   placeholder="Consulted (C)" />
+  <input class="w-md" name="informed"    placeholder="Informed (I)" />
+  <button type="submit" class="btn-add">+ Add</button>
+</form>
+
+<div class="board-wrap">
+  <div class="group-hd">
+    <span class="group-dot" style="background:var(--status-orange)"></span>
+    RACI Matrix
+    <span class="group-count">{{ data.raci | default([]) | length }}</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px"></th>
+        <th>Activity / Task</th>
+        <th style="width:160px">
+          <span style="color:var(--pri-high-bg)">R</span> Responsible
+        </th>
+        <th style="width:160px">
+          <span style="color:var(--pri-med-bg)">A</span> Accountable
+        </th>
+        <th style="width:160px">
+          <span style="color:var(--brand)">C</span> Consulted
+        </th>
+        <th style="width:160px">
+          <span style="color:var(--pri-low-bg)">I</span> Informed
+        </th>
+        <th style="width:90px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data.raci | default([]) %}
+      <tr>
+        <td style="color:var(--subtle);font-size:12px;font-weight:600">{{ loop.index }}</td>
+        <td class="td-title">{{ row.activity }}</td>
+        <td>
+          {% if row.responsible %}
+          <span style="display:inline-flex;align-items:center;gap:4px;
+                       padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;
+                       background:#fce8eb;color:var(--pri-high-bg)">
+            R · {{ row.responsible }}
+          </span>
+          {% else %}<span style="color:var(--subtle);font-size:12px">—</span>{% endif %}
+        </td>
+        <td>
+          {% if row.accountable %}
+          <span style="display:inline-flex;align-items:center;gap:4px;
+                       padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;
+                       background:#faeeda;color:var(--pri-med-bg)">
+            A · {{ row.accountable }}
+          </span>
+          {% else %}<span style="color:var(--subtle);font-size:12px">—</span>{% endif %}
+        </td>
+        <td>
+          {% if row.consulted %}
+          <span style="display:inline-flex;align-items:center;gap:4px;
+                       padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;
+                       background:var(--brand-l);color:var(--brand-d)">
+            C · {{ row.consulted }}
+          </span>
+          {% else %}<span style="color:var(--subtle);font-size:12px">—</span>{% endif %}
+        </td>
+        <td>
+          {% if row.informed %}
+          <span style="display:inline-flex;align-items:center;gap:4px;
+                       padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;
+                       background:#e6f1fb;color:var(--pri-low-bg)">
+            I · {{ row.informed }}
+          </span>
+          {% else %}<span style="color:var(--subtle);font-size:12px">—</span>{% endif %}
+        </td>
+        <td>
+          <form method="POST"
+                action="{{ url_for('dashboard.raci_delete', item_id=row.id) }}">
+            <button type="submit" class="btn-del">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row">
+        <td colspan="7">No RACI entries yet — add your first activity above.</td>
+      </tr>
+      {% endfor %}
+      <tr class="row-add"><td colspan="7">+ Add activity</td></tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

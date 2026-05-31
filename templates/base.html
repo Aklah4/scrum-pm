@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scrum PM — {% block title %}Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+  <script>
+    (function () {
+      var t = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <a href="{{ url_for('dashboard.projects_home') if session.username else '#' }}"
+       class="nav-brand" style="text-decoration:none">scrum<span>-pm</span></a>
+
+    {% if session.username and active_project_name %}
+      <span class="active-project-badge" title="{{ active_project_name }}">
+        {{ active_project_name }}
+      </span>
+    {% endif %}
+  </div>
+
+  <div class="nav-right">
+    <button id="theme-toggle" class="btn-sm" onclick="toggleTheme()"
+            style="cursor:pointer;font-size:12px">☾ Dark</button>
+
+    {% if session.username %}
+      {% if session.project_id %}
+        <a href="{{ url_for('dashboard.projects_exit') }}" class="nav-switch"
+           title="Go back to project list">⇄ Switch project</a>
+      {% endif %}
+      <span class="nav-user">{{ session.username }}</span>
+      <a href="{{ url_for('auth.logout') }}" class="btn-sm">Log out</a>
+    {% endif %}
+  </div>
+</nav>
+
+{# Tab bar only visible when a project is active #}
+{% if session.username and session.project_id %}
+<div class="tab-bar">
+  <a href="{{ url_for('dashboard.overview') }}"
+     class="tab {% if request.endpoint == 'dashboard.overview' %}active{% endif %}">Overview</a>
+  <a href="{{ url_for('dashboard.backlog') }}"
+     class="tab {% if request.endpoint == 'dashboard.backlog' %}active{% endif %}">Backlog</a>
+  <a href="{{ url_for('dashboard.sprint') }}"
+     class="tab {% if request.endpoint == 'dashboard.sprint' %}active{% endif %}">Sprint</a>
+  <a href="{{ url_for('dashboard.risks') }}"
+     class="tab {% if request.endpoint == 'dashboard.risks' %}active{% endif %}">Risks</a>
+  <a href="{{ url_for('dashboard.team') }}"
+     class="tab {% if request.endpoint == 'dashboard.team' %}active{% endif %}">Team</a>
+  <a href="{{ url_for('dashboard.dod') }}"
+     class="tab {% if request.endpoint == 'dashboard.dod' %}active{% endif %}">DoD</a>
+  <a href="{{ url_for('dashboard.retro') }}"
+     class="tab {% if request.endpoint == 'dashboard.retro' %}active{% endif %}">Retro</a>
+  <a href="{{ url_for('dashboard.comms') }}"
+     class="tab {% if request.endpoint == 'dashboard.comms' %}active{% endif %}">Comms Plan</a>
+  <a href="{{ url_for('dashboard.stakeholders') }}"
+     class="tab {% if request.endpoint == 'dashboard.stakeholders' %}active{% endif %}">Stakeholders</a>
+  <a href="{{ url_for('dashboard.raci') }}"
+     class="tab {% if request.endpoint == 'dashboard.raci' %}active{% endif %}">RACI</a>
+  <a href="{{ url_for('dashboard.sprint_config') }}"
+     class="tab {% if request.endpoint == 'dashboard.sprint_config' %}active{% endif %}">Sprint Config</a>
+  <a href="{{ url_for('dashboard.analytics') }}"
+     class="tab {% if request.endpoint == 'dashboard.analytics' %}active{% endif %}">Analytics</a>
+</div>
+{% endif %}
+
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

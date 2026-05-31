@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Stakeholders{% endblock %}
+{% block content %}
+
+<div class="page-hd">
+  <h1 class="page-title">Stakeholder Register</h1>
+</div>
+
+<form method="POST" action="{{ url_for('dashboard.stakeholders_add') }}" class="add-form">
+  <input class="grow" name="name"    placeholder="Stakeholder name" required />
+  <input class="w-md" name="org"     placeholder="Organisation" />
+  <input class="w-md" name="title"   placeholder="Job title" />
+  <select name="interest">
+    <option value="high">Interest: High</option>
+    <option value="med" selected>Interest: Med</option>
+    <option value="low">Interest: Low</option>
+  </select>
+  <select name="influence">
+    <option value="high">Influence: High</option>
+    <option value="med" selected>Influence: Med</option>
+    <option value="low">Influence: Low</option>
+  </select>
+  <input class="w-md" name="contact" placeholder="Email / contact" />
+  <input class="grow" name="notes"   placeholder="Notes" />
+  <button type="submit" class="btn-add">+ Add</button>
+</form>
+
+<div class="board-wrap">
+  <div class="group-hd">
+    <span class="group-dot" style="background:var(--status-purple)"></span>
+    Stakeholders
+    <span class="group-count">{{ data.stakeholders | default([]) | length }}</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px"></th>
+        <th>Name</th>
+        <th>Organisation</th>
+        <th>Title</th>
+        <th style="width:120px">Interest</th>
+        <th style="width:130px">Influence</th>
+        <th>Contact</th>
+        <th>Notes</th>
+        <th style="width:90px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in data.stakeholders | default([]) %}
+      <tr>
+        <td style="color:var(--subtle);font-size:12px;font-weight:600">{{ loop.index }}</td>
+        <td class="td-title">{{ s.name }}</td>
+        <td style="font-size:13px">{{ s.org or "—" }}</td>
+        <td style="font-size:13px">{{ s.title or "—" }}</td>
+        <td>
+          {% if s.interest == "high" %}
+            <span class="pri pri-high">● High</span>
+          {% elif s.interest == "med" %}
+            <span class="pri pri-med">● Medium</span>
+          {% else %}
+            <span class="pri pri-low">● Low</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if s.influence == "high" %}
+            <span class="pri pri-high">● High</span>
+          {% elif s.influence == "med" %}
+            <span class="pri pri-med">● Medium</span>
+          {% else %}
+            <span class="pri pri-low">● Low</span>
+          {% endif %}
+        </td>
+        <td style="font-size:13px;color:var(--text-2)">{{ s.contact or "—" }}</td>
+        <td style="font-size:13px;color:var(--text-2)">{{ s.notes or "—" }}</td>
+        <td>
+          <form method="POST"
+                action="{{ url_for('dashboard.stakeholders_delete', item_id=s.id) }}">
+            <button type="submit" class="btn-del">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row">
+        <td colspan="9">No stakeholders yet — add your first one above.</td>
+      </tr>
+      {% endfor %}
+      <tr class="row-add"><td colspan="9">+ Add stakeholder</td></tr>
+    </tbody>
+  </table>
+</div>
+
+{% set items = data.stakeholders | default([]) %}
+{% if items %}
+<div style="margin-top:20px">
+  <p class="sec-label" style="margin-bottom:12px">Stakeholder Map</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    {% for level in ["high","med","low"] %}
+    {% set label = {"high":"High","med":"Medium","low":"Low"}[level] %}
+    <div class="charter-card" style="padding:14px 16px">
+      <p class="sec-label" style="margin-bottom:8px">{{ label }} influence</p>
+      {% for s in items if s.influence == level %}
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="width:28px;height:28px;border-radius:50%;
+                      background:var(--brand-l);color:var(--brand-d);
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:11px;font-weight:700;flex-shrink:0">
+            {{ s.name[:2] | upper }}
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600">{{ s.name }}</div>
+            <div style="font-size:11px;color:var(--text-2)">Interest:
+              {% if s.interest == "high" %}<span style="color:var(--pri-high-bg)">High</span>
+              {% elif s.interest == "med" %}<span style="color:var(--pri-med-bg)">Med</span>
+              {% else %}<span style="color:var(--pri-low-bg)">Low</span>{% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <p style="font-size:12px;color:var(--subtle)">None</p>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

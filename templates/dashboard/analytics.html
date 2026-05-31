@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<div class="page-hd">
+  <h1 class="page-title">Overall Progress Analytics</h1>
+</div>
+
+{# ── Summary metrics ── #}
+<div class="metrics" style="margin-bottom:24px">
+  <div class="metric">
+    <div class="mlabel">Total Stories</div>
+    <div class="mval" id="m-stories">—</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">Sprint Done</div>
+    <div class="mval" style="color:var(--brand)" id="m-done">—</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">Tasks Done</div>
+    <div class="mval" style="color:var(--brand)" id="m-tasks">—</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">Phases Done</div>
+    <div class="mval" id="m-phases">—</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">DoD Complete</div>
+    <div class="mval" id="m-dod">—</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">Team Size</div>
+    <div class="mval" id="m-team">—</div>
+  </div>
+  <div class="metric">
+    <div class="mlabel">High Risks</div>
+    <div class="mval" style="color:var(--pri-high-bg)" id="m-risks">—</div>
+  </div>
+</div>
+
+{# ── Charts grid ── #}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+  {# Doughnut — sprint board #}
+  <div class="charter-card" style="display:flex;flex-direction:column;gap:10px">
+    <p class="sec-label">Sprint Board Status</p>
+    <p style="font-size:12px;color:var(--text-2)">Sprint-assigned stories by kanban status</p>
+    <div style="position:relative;height:260px;display:flex;align-items:center;justify-content:center">
+      <canvas id="chartSprint"></canvas>
+    </div>
+  </div>
+
+  {# Bar — backlog priority #}
+  <div class="charter-card" style="display:flex;flex-direction:column;gap:10px">
+    <p class="sec-label">Backlog by Priority</p>
+    <p style="font-size:12px;color:var(--text-2)">Number of user stories per priority level</p>
+    <div style="position:relative;height:260px">
+      <canvas id="chartPriority"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+  {# Histogram — story points #}
+  <div class="charter-card" style="display:flex;flex-direction:column;gap:10px">
+    <p class="sec-label">Story Points Distribution</p>
+    <p style="font-size:12px;color:var(--text-2)">Frequency of stories by point bucket</p>
+    <div style="position:relative;height:260px">
+      <canvas id="chartPts"></canvas>
+    </div>
+  </div>
+
+  {# Horizontal bar — phase progress #}
+  <div class="charter-card" style="display:flex;flex-direction:column;gap:10px">
+    <p class="sec-label">Phase Progress</p>
+    <p style="font-size:12px;color:var(--text-2)">Phases in each state across the project</p>
+    <div style="position:relative;height:260px">
+      <canvas id="chartPhases"></canvas>
+    </div>
+  </div>
+
+</div>
+
+{# Risk breakdown — full width #}
+<div class="charter-card" style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+  <p class="sec-label">Risk Level Breakdown</p>
+  <p style="font-size:12px;color:var(--text-2)">Number of risks per severity level</p>
+  <div style="position:relative;height:200px">
+    <canvas id="chartRisks"></canvas>
+  </div>
+</div>
+
+<script>
+const CD = {{ chart_data | safe }};
+
+// ── Theme-aware colours ──────────────────────────────────
+function cssVar(v) {
+  return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+}
+function textColor()    { return cssVar("--text");    }
+function mutedColor()   { return cssVar("--text-2");  }
+function borderColor()  { return cssVar("--border");  }
+function surfaceColor() { return cssVar("--surface2");}
+
+// ── Shared defaults ──────────────────────────────────────
+Chart.defaults.font.family = cssVar("--font") || "Inter, sans-serif";
+Chart.defaults.font.size   = 12;
+
+const GRID_OPT = () => ({
+  color: borderColor(),
+  drawBorder: false
+});
+const TICK_OPT = () => ({ color: mutedColor() });
+
+function legend(pos = "bottom") {
+  return {
+    position: pos,
+    labels: { color: textColor(), padding: 16, boxWidth: 12, font: { size: 12 } }
+  };
+}
+
+// ── 1. Doughnut — sprint board ───────────────────────────
+new Chart(document.getElementById("chartSprint"), {
+  type: "doughnut",
+  data: {
+    labels: ["To Do", "In Progress", "Done"],
+    datasets: [{
+      data: [CD.sprint.todo, CD.sprint.inprog, CD.sprint.done],
+      backgroundColor: ["#c4c4c4", "#fdab3d", "#00c875"],
+      borderColor:     ["#c4c4c4", "#fdab3d", "#00c875"],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "65%",
+    plugins: {
+      legend: legend("right"),
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.label}: ${ctx.parsed} card${ctx.parsed !== 1 ? "s" : ""}`
+        }
+      }
+    }
+  }
+});
+
+// ── 2. Bar — backlog priority ────────────────────────────
+new Chart(document.getElementById("chartPriority"), {
+  type: "bar",
+  data: {
+    labels: ["High", "Medium", "Low"],
+    datasets: [{
+      label: "Stories",
+      data:  [CD.priority.high, CD.priority.med, CD.priority.low],
+      backgroundColor: ["#e2445c", "#fdab3d", "#378add"],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} stor${ctx.parsed.y !== 1 ? "ies" : "y"}` } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: TICK_OPT() },
+      y: {
+        grid: GRID_OPT(),
+        ticks: { ...TICK_OPT(), stepSize: 1, precision: 0 },
+        beginAtZero: true
+      }
+    }
+  }
+});
+
+// ── 3. Histogram — story points ──────────────────────────
+const ptsBuckets = CD.pts_buckets;
+new Chart(document.getElementById("chartPts"), {
+  type: "bar",
+  data: {
+    labels: Object.keys(ptsBuckets).map(k => k + " pts"),
+    datasets: [{
+      label: "Stories",
+      data:  Object.values(ptsBuckets),
+      backgroundColor: "#578bfc",
+      borderRadius: 6,
+      borderSkipped: false,
+      barPercentage: 0.85,
+      categoryPercentage: 0.85
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} stor${ctx.parsed.y !== 1 ? "ies" : "y"}` } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: TICK_OPT() },
+      y: {
+        grid: GRID_OPT(),
+        ticks: { ...TICK_OPT(), stepSize: 1, precision: 0 },
+        beginAtZero: true
+      }
+    }
+  }
+});
+
+// ── 4. Horizontal bar — phases ───────────────────────────
+new Chart(document.getElementById("chartPhases"), {
+  type: "bar",
+  data: {
+    labels: ["Done", "Active", "To Do"],
+    datasets: [{
+      label: "Phases",
+      data:  [CD.phase_done, CD.phase_active, CD.phase_todo],
+      backgroundColor: ["#00c875", "#fdab3d", "#c4c4c4"],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} phase${ctx.parsed.x !== 1 ? "s" : ""}` } }
+    },
+    scales: {
+      x: {
+        grid: GRID_OPT(),
+        ticks: { ...TICK_OPT(), stepSize: 1, precision: 0 },
+        beginAtZero: true
+      },
+      y: { grid: { display: false }, ticks: TICK_OPT() }
+    }
+  }
+});
+
+// ── 5. Bar — risk breakdown ──────────────────────────────
+new Chart(document.getElementById("chartRisks"), {
+  type: "bar",
+  data: {
+    labels: ["High", "Medium", "Low"],
+    datasets: [{
+      label: "Risks",
+      data:  [CD.risk_counts.high, CD.risk_counts.med, CD.risk_counts.low],
+      backgroundColor: ["#e2445c", "#fdab3d", "#378add"],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} risk${ctx.parsed.y !== 1 ? "s" : ""}` } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: TICK_OPT() },
+      y: {
+        grid: GRID_OPT(),
+        ticks: { ...TICK_OPT(), stepSize: 1, precision: 0 },
+        beginAtZero: true
+      }
+    }
+  }
+});
+
+// ── Summary metrics ──────────────────────────────────────
+document.getElementById("m-stories").textContent = CD.total_stories;
+document.getElementById("m-done").textContent    =
+  CD.sprint.done + "/" + CD.sprint_assigned;
+document.getElementById("m-tasks").textContent   =
+  CD.tasks_total > 0 ? CD.tasks_done + "/" + CD.tasks_total : "—";
+document.getElementById("m-phases").textContent  =
+  CD.phase_done + "/" + (CD.phase_done + CD.phase_active + CD.phase_todo);
+document.getElementById("m-dod").textContent     =
+  CD.dod_done + "/" + CD.dod_total;
+document.getElementById("m-team").textContent    = CD.team_size;
+document.getElementById("m-risks").textContent   = CD.risk_counts.high;
+</script>
+
+{% endblock %}

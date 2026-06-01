@@ -54,17 +54,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand:    #1D9E75;
-      --brand-d:  #0d7a59;
-      --brand-l:  rgba(29,158,117,.12);
-      --bg:       #060608;
-      --surface:  #0e0e12;
-      --card:     #13131a;
-      --card2:    #18181f;
+      --brand:    #00ED64;
+      --brand-d:  #00684A;
+      --brand-l:  rgba(0,237,100,.12);
+      --bg:       #001E2B;
+      --surface:  #012433;
+      --card:     #0A2D3F;
+      --card2:    #0D3348;
       --border:   rgba(255,255,255,.07);
-      --border2:  rgba(255,255,255,.12);
-      --text:     #f2f2f0;
-      --muted:    #7a7a8a;
+      --border2:  rgba(255,255,255,.13);
+      --text:     #E8EDEB;
+      --muted:    #889397;
       --subtle:   rgba(255,255,255,.04);
       --font:     'Inter', -apple-system, sans-serif;
       --radius:   12px;
@@ -168,7 +168,7 @@
       transform: translateX(-50%);
       width: 800px;
       height: 600px;
-      background: radial-gradient(ellipse at center, rgba(29,158,117,.18) 0%, transparent 70%);
+      background: radial-gradient(ellipse at center, rgba(0,237,100,.18) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero-eyebrow {
@@ -177,8 +177,8 @@
       gap: 8px;
       padding: 6px 16px;
       border-radius: 20px;
-      border: 1px solid rgba(29,158,117,.3);
-      background: rgba(29,158,117,.08);
+      border: 1px solid rgba(0,237,100,.3);
+      background: rgba(0,237,100,.08);
       font-size: 12px;
       font-weight: 600;
       color: var(--brand);
@@ -206,7 +206,7 @@
       max-width: 800px;
     }
     .hero h1 .highlight {
-      background: linear-gradient(135deg, #1D9E75 0%, #4ecca3 50%, #1D9E75 100%);
+      background: linear-gradient(135deg, #00ED64 0%, #00ED64 50%, #00ED64 100%);
       background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -242,12 +242,12 @@
       font-weight: 700;
       color: #fff;
       transition: background .15s, transform .1s, box-shadow .15s;
-      box-shadow: 0 0 0 0 rgba(29,158,117,0);
+      box-shadow: 0 0 0 0 rgba(0,237,100,0);
     }
     .btn-hero-primary:hover {
       background: var(--brand-d);
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(29,158,117,.35);
+      box-shadow: 0 8px 30px rgba(0,237,100,.35);
     }
     .btn-hero-secondary {
       display: inline-flex;
@@ -439,7 +439,7 @@
       transition: opacity .2s;
     }
     .feature-card:hover {
-      border-color: rgba(29,158,117,.4);
+      border-color: rgba(0,237,100,.4);
       transform: translateY(-4px);
       box-shadow: 0 20px 40px rgba(0,0,0,.3);
     }
@@ -449,7 +449,7 @@
       height: 44px;
       border-radius: 10px;
       background: var(--brand-l);
-      border: 1px solid rgba(29,158,117,.2);
+      border: 1px solid rgba(0,237,100,.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -530,7 +530,7 @@
       top: -60px; left: 50%;
       transform: translateX(-50%);
       width: 400px; height: 400px;
-      background: radial-gradient(ellipse, rgba(29,158,117,.15) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(0,237,100,.15) 0%, transparent 70%);
       pointer-events: none;
     }
     .cta-card h2 {
@@ -551,12 +551,12 @@
     .btn-large.primary {
       background: var(--brand);
       color: #fff;
-      box-shadow: 0 4px 20px rgba(29,158,117,.3);
+      box-shadow: 0 4px 20px rgba(0,237,100,.3);
     }
     .btn-large.primary:hover {
       background: var(--brand-d);
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(29,158,117,.45);
+      box-shadow: 0 8px 30px rgba(0,237,100,.45);
     }
     .btn-large.secondary {
       background: none;

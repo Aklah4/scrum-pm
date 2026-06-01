@@ -14,6 +14,10 @@ projects = db["projects"]
 # Compound unique index — one document per (user, project)
 projects.create_index([("username", 1), ("project_id", 1)], unique=True)
 
+# Unique indexes on users
+users.create_index("username", unique=True)
+users.create_index("email",    unique=True, sparse=True)
+
 
 DEFAULT_PROJECT = {
     "project": {

@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask, session, redirect, url_for, render_template
 from dotenv import load_dotenv
 import os
 
@@ -33,6 +33,13 @@ def inject_active_project():
         if doc:
             return {"active_project_name": doc.get("project", {}).get("name", "")}
     return {"active_project_name": None}
+
+
+@app.route("/")
+def landing():
+    if "username" in session:
+        return redirect(url_for("dashboard.projects_home"))
+    return render_template("landing.html")
 
 
 if __name__ == "__main__":

@@ -100,7 +100,7 @@ def projects_exit():
 
 # ── OVERVIEW ──────────────────────────────────────────────
 
-@dashboard_bp.route("/")
+@dashboard_bp.route("/overview")
 @project_required
 def overview():
     data = get_project(session["username"], session["project_id"])
@@ -128,7 +128,7 @@ def overview_save():
     return redirect(url_for("dashboard.overview"))
 
 
-# ── BACKLOG ───────────────────────────────────────────────
+# ── BACKLOG & STORIES ─────────────────────────────────────
 
 @dashboard_bp.route("/backlog")
 @project_required
@@ -224,6 +224,55 @@ def backlog_delete(story_id):
     return redirect(url_for("dashboard.backlog"))
 
 
+@dashboard_bp.route("/story/<story_id>/task/add", methods=["POST"])
+@project_required
+def task_add(story_id):
+    username, pid = session["username"], session["project_id"]
+    data    = get_project(username, pid)
+    stories = data.get("stories", [])
+    for s in stories:
+        if s["id"] == story_id:
+            tasks = s.get("tasks", [])
+            text  = request.form.get("text", "").strip()
+            if text:
+                tasks.append({"id": f"t_{int(time.time())}", "text": text, "done": False})
+                s["tasks"] = tasks
+            break
+    _save(username, pid, {"stories": stories})
+    return redirect(_safe_next(request.form.get("next"), url_for("dashboard.backlog")))
+
+
+@dashboard_bp.route("/story/<story_id>/task/toggle/<task_id>", methods=["POST"])
+@project_required
+def task_toggle(story_id, task_id):
+    username, pid = session["username"], session["project_id"]
+    data    = get_project(username, pid)
+    stories = data.get("stories", [])
+    for s in stories:
+        if s["id"] == story_id:
+            for t in s.get("tasks", []):
+                if t["id"] == task_id:
+                    t["done"] = not t.get("done", False)
+                    break
+            break
+    _save(username, pid, {"stories": stories})
+    return redirect(_safe_next(request.form.get("next"), url_for("dashboard.backlog")))
+
+
+@dashboard_bp.route("/story/<story_id>/task/delete/<task_id>", methods=["POST"])
+@project_required
+def task_delete(story_id, task_id):
+    username, pid = session["username"], session["project_id"]
+    data    = get_project(username, pid)
+    stories = data.get("stories", [])
+    for s in stories:
+        if s["id"] == story_id:
+            s["tasks"] = [t for t in s.get("tasks", []) if t["id"] != task_id]
+            break
+    _save(username, pid, {"stories": stories})
+    return redirect(_safe_next(request.form.get("next"), url_for("dashboard.backlog")))
+
+
 # ── SPRINTS ───────────────────────────────────────────────
 
 @dashboard_bp.route("/sprints/add", methods=["POST"])
@@ -245,7 +294,6 @@ def sprints_add():
     return redirect(url_for("dashboard.sprint_config"))
 
 
-
 @dashboard_bp.route("/sprints/delete/<sprint_id>", methods=["POST"])
 @project_required
 def sprints_delete(sprint_id):
@@ -259,8 +307,6 @@ def sprints_delete(sprint_id):
     _save(username, pid, {"sprints": sprints_list, "stories": stories})
     return redirect(url_for("dashboard.sprint_config"))
 
-
-# ── SPRINT BOARD ──────────────────────────────────────────
 
 @dashboard_bp.route("/sprint")
 @project_required
@@ -325,55 +371,45 @@ def sprint_story_back(story_id):
     return redirect(url_for("dashboard.sprint", sprint=request.form.get("sprint_id", "")))
 
 
-# ── STORY TASKS ───────────────────────────────────────────
-
-@dashboard_bp.route("/story/<story_id>/task/add", methods=["POST"])
+@dashboard_bp.route("/sprint-config")
 @project_required
-def task_add(story_id):
-    username, pid = session["username"], session["project_id"]
-    data    = get_project(username, pid)
-    stories = data.get("stories", [])
-    for s in stories:
-        if s["id"] == story_id:
-            tasks = s.get("tasks", [])
-            text  = request.form.get("text", "").strip()
-            if text:
-                tasks.append({"id": f"t_{int(time.time())}", "text": text, "done": False})
-                s["tasks"] = tasks
-            break
-    _save(username, pid, {"stories": stories})
-    return redirect(_safe_next(request.form.get("next"), url_for("dashboard.backlog")))
+def sprint_config():
+    data         = get_project(session["username"], session["project_id"])
+    sprints_list = data.get("sprints", [])
+    return render_template("dashboard/sprint_config.html", data=data, sprints=sprints_list)
 
 
-@dashboard_bp.route("/story/<story_id>/task/toggle/<task_id>", methods=["POST"])
+@dashboard_bp.route("/sprint-config/save", methods=["POST"])
 @project_required
-def task_toggle(story_id, task_id):
+def sprint_config_save():
     username, pid = session["username"], session["project_id"]
-    data    = get_project(username, pid)
-    stories = data.get("stories", [])
-    for s in stories:
-        if s["id"] == story_id:
-            for t in s.get("tasks", []):
-                if t["id"] == task_id:
-                    t["done"] = not t.get("done", False)
-                    break
-            break
-    _save(username, pid, {"stories": stories})
-    return redirect(_safe_next(request.form.get("next"), url_for("dashboard.backlog")))
+    cfg = {
+        "name":       request.form.get("name", "Sprint 1").strip(),
+        "goal":       request.form.get("goal", "").strip(),
+        "start_date": request.form.get("start_date", "").strip(),
+        "end_date":   request.form.get("end_date", "").strip(),
+        "length":     request.form.get("length", "2"),
+        "velocity":   request.form.get("velocity", "").strip(),
+        "capacity":   request.form.get("capacity", "").strip(),
+    }
+    dor_texts = request.form.getlist("dor_text")
+    existing  = request.form.getlist("dor_existing")
+    dor = [{"text": t.strip()} for t in dor_texts if t.strip()]
+    dor += [{"text": t.strip()} for t in existing if t.strip()]
+    _save(username, pid, {"sprint_cfg": cfg, "dor": dor})
+    return redirect(url_for("dashboard.sprint_config"))
 
 
-@dashboard_bp.route("/story/<story_id>/task/delete/<task_id>", methods=["POST"])
+@dashboard_bp.route("/sprint-config/dor/delete/<int:idx>", methods=["POST"])
 @project_required
-def task_delete(story_id, task_id):
+def dor_delete(idx):
     username, pid = session["username"], session["project_id"]
-    data    = get_project(username, pid)
-    stories = data.get("stories", [])
-    for s in stories:
-        if s["id"] == story_id:
-            s["tasks"] = [t for t in s.get("tasks", []) if t["id"] != task_id]
-            break
-    _save(username, pid, {"stories": stories})
-    return redirect(_safe_next(request.form.get("next"), url_for("dashboard.backlog")))
+    data = get_project(username, pid)
+    dor  = data.get("dor", [])
+    if 0 <= idx < len(dor):
+        del dor[idx]
+        _save(username, pid, {"dor": dor})
+    return redirect(url_for("dashboard.sprint_config"))
 
 
 # ── RISKS ─────────────────────────────────────────────────
@@ -625,49 +661,6 @@ def raci_delete(item_id):
     lst  = [r for r in data.get("raci", []) if r["id"] != item_id]
     _save(username, pid, {"raci": lst})
     return redirect(url_for("dashboard.raci"))
-
-
-# ── SPRINT CONFIGURATION ──────────────────────────────────
-
-@dashboard_bp.route("/sprint-config")
-@project_required
-def sprint_config():
-    data         = get_project(session["username"], session["project_id"])
-    sprints_list = data.get("sprints", [])
-    return render_template("dashboard/sprint_config.html", data=data, sprints=sprints_list)
-
-
-@dashboard_bp.route("/sprint-config/save", methods=["POST"])
-@project_required
-def sprint_config_save():
-    username, pid = session["username"], session["project_id"]
-    cfg = {
-        "name":       request.form.get("name", "Sprint 1").strip(),
-        "goal":       request.form.get("goal", "").strip(),
-        "start_date": request.form.get("start_date", "").strip(),
-        "end_date":   request.form.get("end_date", "").strip(),
-        "length":     request.form.get("length", "2"),
-        "velocity":   request.form.get("velocity", "").strip(),
-        "capacity":   request.form.get("capacity", "").strip(),
-    }
-    dor_texts = request.form.getlist("dor_text")
-    existing  = request.form.getlist("dor_existing")
-    dor = [{"text": t.strip()} for t in dor_texts if t.strip()]
-    dor += [{"text": t.strip()} for t in existing if t.strip()]
-    _save(username, pid, {"sprint_cfg": cfg, "dor": dor})
-    return redirect(url_for("dashboard.sprint_config"))
-
-
-@dashboard_bp.route("/sprint-config/dor/delete/<int:idx>", methods=["POST"])
-@project_required
-def dor_delete(idx):
-    username, pid = session["username"], session["project_id"]
-    data = get_project(username, pid)
-    dor  = data.get("dor", [])
-    if 0 <= idx < len(dor):
-        del dor[idx]
-        _save(username, pid, {"dor": dor})
-    return redirect(url_for("dashboard.sprint_config"))
 
 
 # ── ANALYTICS ─────────────────────────────────────────────

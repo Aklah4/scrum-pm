@@ -16,8 +16,8 @@
 
 <nav class="navbar">
   <div class="nav-left">
-    <a href="{{ url_for('dashboard.projects_home') if session.username else '#' }}"
-       class="nav-brand" style="text-decoration:none">scrum<span>-pm</span></a>
+    <a href="{{ url_for('dashboard.projects_home') if session.username else url_for('landing') }}"
+       class="nav-brand" style="text-decoration:none">Scrum<span>PM</span></a>
 
     {% if session.username and active_project_name %}
       <span class="active-project-badge" title="{{ active_project_name }}">

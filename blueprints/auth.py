@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from db import users
+from extensions import limiter
 from datetime import datetime
 import bcrypt
 import re
@@ -23,6 +24,7 @@ def _email_domain_valid(email):
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def register():
     error = None
     if request.method == "POST":
@@ -58,6 +60,7 @@ def register():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute")
 def login():
     error = None
     if request.method == "POST":

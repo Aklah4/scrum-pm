@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, request
 from db import contactus as contactus_col
+from extensions import limiter
 from datetime import datetime, timezone
 
 contactus_bp = Blueprint("contactus", __name__)
 
 
 @contactus_bp.route("/contact", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def contact():
     success = False
     error   = None

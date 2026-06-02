@@ -35,6 +35,14 @@ from blueprints.dashboard.dod import dod_bp
 from blueprints.dashboard.risks import risks_bp
 from blueprints.dashboard.retro import retro_bp
 from blueprints.dashboard.raci import raci_bp
+from extensions import limiter
+
+
+limiter.init_app(app)
+
+
+
+
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)

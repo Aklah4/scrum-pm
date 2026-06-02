@@ -1,26 +1,11 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
 from db import users
 from extensions import limiter
+from email_validator import validate_email, EmailNotValidError
 from datetime import datetime
 import bcrypt
-import re
-import dns.resolver
 
 auth_bp = Blueprint("auth", __name__)
-
-_EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$')
-
-
-def _email_domain_valid(email):
-    """Return True if the email's domain has MX records (can receive mail)."""
-    try:
-        domain = email.split('@')[1]
-        dns.resolver.resolve(domain, 'MX', lifetime=5)
-        return True
-    except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.NoNameservers):
-        return False
-    except Exception:
-        return True  # DNS unavailable — fail open rather than block all registrations
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -35,26 +20,29 @@ def register():
 
         if not username or not email or not password:
             error = "All fields are required."
-        elif not _EMAIL_RE.match(email):
-            error = "Please enter a valid email address."
-        elif not _email_domain_valid(email):
-            error = "That email domain doesn't exist. Please use a real email address."
-        elif len(password) < 8:
-            error = "Password must be at least 8 characters."
-        elif password != confirm:
-            error = "Passwords do not match."
-        elif users.find_one({"username": username}):
-            error = "Username already taken."
-        elif users.find_one({"email": email}):
-            error = "An account with that email already exists."
         else:
-            users.insert_one({
-                "username":      username,
-                "email":         email,
-                "password_hash": bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()),
-                "created_at":    datetime.utcnow()
-            })
-            return redirect(url_for("auth.login"))
+            try:
+                email = validate_email(email, check_deliverability=True).normalized
+            except EmailNotValidError as e:
+                error = str(e)
+
+        if not error:
+            if len(password) < 8:
+                error = "Password must be at least 8 characters."
+            elif password != confirm:
+                error = "Passwords do not match."
+            elif users.find_one({"username": username}):
+                error = "Username already taken."
+            elif users.find_one({"email": email}):
+                error = "An account with that email already exists."
+            else:
+                users.insert_one({
+                    "username":      username,
+                    "email":         email,
+                    "password_hash": bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()),
+                    "created_at":    datetime.utcnow()
+                })
+                return redirect(url_for("auth.login"))
 
     return render_template("auth/register.html", error=error)
 

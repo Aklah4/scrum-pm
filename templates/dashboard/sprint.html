@@ -9,7 +9,7 @@
 </div>
 <div class="empty-state-box">
   No sprints yet. Go to
-  <a href="{{ url_for('dashboard.backlog') }}">Backlog</a>,
+  <a href="{{ url_for('backlog.backlog') }}">Backlog</a>,
   click <strong>⚡ Sprints</strong> to create a sprint, then assign stories to it.
 </div>
 
@@ -19,7 +19,7 @@
 {% if sprints | length > 1 %}
 <div class="sprint-tabs">
   {% for sp in sprints %}
-  <a href="{{ url_for('dashboard.sprint', sprint=sp.id) }}"
+  <a href="{{ url_for('sprint.sprint', sprint=sp.id) }}"
      class="sprint-tab{% if sprint_id == sp.id %} active{% endif %}">
     {{ sp.name }}
   </a>
@@ -80,7 +80,7 @@
 <div class="empty-state-box">
   No stories assigned to
   <strong>{{ current_sprint.name if current_sprint else 'this sprint' }}</strong>.
-  Go to <a href="{{ url_for('dashboard.backlog') }}">Backlog</a>,
+  Go to <a href="{{ url_for('backlog.backlog') }}">Backlog</a>,
   edit a story and set its sprint to
   <strong>{{ current_sprint.name if current_sprint else 'this sprint' }}</strong>.
 </div>
@@ -122,10 +122,10 @@
       <div id="ktasks-{{ story.id }}" class="kcard-tasks" style="display:none">
         {% for task in stasks %}
         <form method="POST"
-              action="{{ url_for('dashboard.task_toggle', story_id=story.id, task_id=task.id) }}"
+              action="{{ url_for('backlog.task_toggle', story_id=story.id, task_id=task.id) }}"
               class="ktask-form">
           <input type="hidden" name="next"
-                 value="{{ url_for('dashboard.sprint', sprint=sprint_id) }}" />
+                 value="{{ url_for('sprint.sprint', sprint=sprint_id) }}" />
           <button type="submit" class="ktask-btn">
             <span class="ktask-check{% if task.done %} ktask-checked{% endif %}">
               {% if task.done %}✓{% else %}○{% endif %}
@@ -149,7 +149,7 @@
 
         {% if col != "todo" %}
         <form method="POST"
-              action="{{ url_for('dashboard.sprint_story_back', story_id=story.id) }}"
+              action="{{ url_for('sprint.sprint_story_back', story_id=story.id) }}"
               style="display:inline">
           <input type="hidden" name="sprint_id" value="{{ sprint_id }}" />
           <button type="submit" class="btn-back">← back</button>
@@ -158,7 +158,7 @@
 
         {% if col != "done" %}
         <form method="POST"
-              action="{{ url_for('dashboard.sprint_story_move', story_id=story.id) }}"
+              action="{{ url_for('sprint.sprint_story_move', story_id=story.id) }}"
               style="display:inline">
           <input type="hidden" name="sprint_id" value="{{ sprint_id }}" />
           <button type="submit" class="btn-move">→ move</button>

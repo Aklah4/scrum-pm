@@ -6,7 +6,7 @@
   <h1 class="page-title">Stakeholder Register</h1>
 </div>
 
-<form method="POST" action="{{ url_for('dashboard.stakeholders_add') }}" class="add-form">
+<form method="POST" action="{{ url_for('stakeholder.stakeholders_add') }}" class="add-form">
   <input class="grow" name="name"    placeholder="Stakeholder name" required />
   <input class="w-md" name="org"     placeholder="Organisation" />
   <input class="w-md" name="title"   placeholder="Job title" />
@@ -72,9 +72,11 @@
         </td>
         <td style="font-size:13px;color:var(--text-2)">{{ s.contact or "—" }}</td>
         <td style="font-size:13px;color:var(--text-2)">{{ s.notes or "—" }}</td>
-        <td>
+        <td style="display:flex;gap:6px;align-items:center">
+          <button type="button" class="btn-edit"
+                  onclick="openSkEdit('{{ s.id }}','{{ s.name | replace("'","\\'") }}','{{ s.org | replace("'","\\'") }}','{{ s.title | replace("'","\\'") }}','{{ s.interest }}','{{ s.influence }}','{{ s.contact | replace("'","\\'") }}','{{ s.notes | replace("'","\\'") }}')">Edit</button>
           <form method="POST"
-                action="{{ url_for('dashboard.stakeholders_delete', item_id=s.id) }}">
+                action="{{ url_for('stakeholder.stakeholders_delete', item_id=s.id) }}">
             <button type="submit" class="btn-del">Remove</button>
           </form>
         </td>
@@ -88,6 +90,100 @@
     </tbody>
   </table>
 </div>
+
+{# ── Edit modal ── #}
+<div id="sk-edit-overlay" class="edit-overlay" onclick="closeSkEdit(event)">
+  <div class="edit-modal">
+    <h3 class="edit-modal-title">Edit Stakeholder</h3>
+    <form id="sk-edit-form" method="POST">
+      <div class="edit-row">
+        <div class="edit-field" style="flex:2">
+          <label class="edit-label">Name</label>
+          <input id="sk-name" name="name" type="text" class="edit-input" required />
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Organisation</label>
+          <input id="sk-org" name="org" type="text" class="edit-input" />
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Job title</label>
+          <input id="sk-title" name="title" type="text" class="edit-input" />
+        </div>
+      </div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Interest</label>
+          <select id="sk-interest" name="interest" class="edit-select">
+            <option value="high">High</option>
+            <option value="med">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Influence</label>
+          <select id="sk-influence" name="influence" class="edit-select">
+            <option value="high">High</option>
+            <option value="med">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="edit-field" style="flex:2">
+          <label class="edit-label">Contact</label>
+          <input id="sk-contact" name="contact" type="text" class="edit-input" />
+        </div>
+      </div>
+      <div class="edit-field" style="margin-bottom:20px">
+        <label class="edit-label">Notes</label>
+        <input id="sk-notes" name="notes" type="text" class="edit-input" />
+      </div>
+      <div class="edit-actions">
+        <button type="button" class="btn-cancel" onclick="closeSkEditDirect()">Cancel</button>
+        <button type="submit" class="btn-save">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.btn-edit { background: none; border: 1px solid var(--border, #e0e0e0); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: var(--fg, #333); white-space: nowrap; }
+.btn-edit:hover { background: var(--hover-bg, #f5f5f5); }
+.edit-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; align-items: center; justify-content: center; }
+.edit-overlay.open { display: flex; }
+.edit-modal { background: var(--card-bg, #fff); border: 1px solid var(--border, #e0e0e0); border-radius: 10px; padding: 28px 32px; width: min(640px, 95vw); box-shadow: 0 8px 32px rgba(0,0,0,.18); }
+.edit-modal-title { margin: 0 0 18px; font-size: 16px; font-weight: 600; color: var(--fg, #111); }
+.edit-label { display: block; font-size: 12px; font-weight: 600; color: var(--fg-muted, #666); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+.edit-row { display: flex; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.edit-field { flex: 1; min-width: 120px; }
+.edit-select, .edit-input { width: 100%; box-sizing: border-box; padding: 8px 12px; border: 1px solid var(--border, #e0e0e0); border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--fg, #111); background: var(--input-bg, #fff); }
+.edit-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.btn-cancel { background: none; border: 1px solid var(--border, #e0e0e0); border-radius: 6px; padding: 8px 18px; font-size: 14px; cursor: pointer; color: var(--fg, #333); }
+.btn-cancel:hover { background: var(--hover-bg, #f5f5f5); }
+.btn-save { background: var(--brand, #0052cc); border: none; border-radius: 6px; padding: 8px 20px; font-size: 14px; font-weight: 600; cursor: pointer; color: #fff; }
+.btn-save:hover { opacity: .88; }
+</style>
+
+<script>
+function openSkEdit(id, name, org, title, interest, influence, contact, notes) {
+  document.getElementById('sk-edit-form').action = '/dashboard/stakeholders/edit/' + id;
+  document.getElementById('sk-name').value      = name;
+  document.getElementById('sk-org').value       = org;
+  document.getElementById('sk-title').value     = title;
+  document.getElementById('sk-interest').value  = interest;
+  document.getElementById('sk-influence').value = influence;
+  document.getElementById('sk-contact').value   = contact;
+  document.getElementById('sk-notes').value     = notes;
+  document.getElementById('sk-edit-overlay').classList.add('open');
+}
+function closeSkEdit(e) {
+  if (e.target === document.getElementById('sk-edit-overlay')) closeSkEditDirect();
+}
+function closeSkEditDirect() {
+  document.getElementById('sk-edit-overlay').classList.remove('open');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSkEditDirect();
+});
+</script>
 
 {% set items = data.stakeholders | default([]) %}
 {% if items %}

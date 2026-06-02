@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<form method="POST" action="{{ url_for('dashboard.raci_add') }}" class="add-form">
+<form method="POST" action="{{ url_for('raci.raci_add') }}" class="add-form">
   <input class="grow" name="activity"    placeholder="Activity / task" required />
   <input class="w-md" name="responsible" placeholder="Responsible (R)" />
   <input class="w-md" name="accountable" placeholder="Accountable (A)" />
@@ -94,7 +94,7 @@
         </td>
         <td>
           <form method="POST"
-                action="{{ url_for('dashboard.raci_delete', item_id=row.id) }}">
+                action="{{ url_for('raci.raci_delete', item_id=row.id) }}">
             <button type="submit" class="btn-del">Remove</button>
           </form>
         </td>

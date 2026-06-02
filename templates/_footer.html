@@ -1,0 +1,208 @@
+<style>
+  .site-footer {
+    background: var(--surface, #012433);
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    padding: 60px 48px 36px;
+    font-family: var(--font, "Inter", sans-serif);
+    text-align: left;
+  }
+
+  /* ── Alignment fix ── */
+  .sf-brand-name,
+  .sf-tagline,
+  .sf-col-title,
+  .sf-col-links,
+  .sf-link,
+  .sf-copy,
+  .sf-legal-links {
+    text-align: left;
+  }
+
+  .sf-col-links,
+  .sf-col-links.sf-links {
+    text-align: left;
+  }
+
+  /* ── Top grid ── */
+  .sf-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+
+  /* Brand column */
+  .sf-brand-name {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text, #e8edeb);
+    margin-bottom: 10px;
+  }
+  .sf-brand-name span {
+    color: var(--brand, #00ed64);
+  }
+  .sf-tagline {
+    font-size: 13px !important;
+    line-height: 1.65 !important;
+    color: var(--muted, #889397) !important;
+    margin: 0 !important;
+    max-width: 220px;
+  }
+
+  /* Link columns */
+  .sf-col-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted, #889397);
+    margin-bottom: 18px;
+  }
+  .sf-col-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sf-link {
+    font-size: 14px !important;
+    color: var(--text, #e8edeb) !important;
+    text-decoration: none;
+    opacity: 0.7;
+    line-height: 1.4 !important;
+    transition:
+      opacity 0.15s,
+      color 0.15s;
+  }
+  .sf-link:hover {
+    opacity: 1;
+    color: var(--brand, #00ed64) !important;
+  }
+
+  /* ── Divider ── */
+  .sf-divider {
+    height: 1px;
+    background: var(--border, rgba(255, 255, 255, 0.08));
+    margin-bottom: 28px;
+  }
+
+  /* ── Bottom bar ── */
+  .sf-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .sf-copy {
+    font-size: 12px !important;
+    color: var(--muted, #889397) !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+  .sf-legal-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .sf-legal-links .sf-link {
+    font-size: 12px !important;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .site-footer {
+      padding: 48px 32px 32px;
+    }
+    .sf-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+    }
+  }
+  @media (max-width: 560px) {
+    .site-footer {
+      padding: 40px 20px 28px;
+    }
+    .sf-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    .sf-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  @media (max-width: 360px) {
+    .sf-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="sf-grid">
+    <!-- Brand -->
+    <div>
+      <div class="sf-brand-name">Scrum<span>PM</span></div>
+      <p class="sf-tagline">
+        The all-in-one Scrum platform for modern agile teams.
+      </p>
+    </div>
+
+    <!-- Product -->
+    <div>
+      <div class="sf-col-title">Product</div>
+      <div role="navigation" aria-label="Product" class="sf-col-links">
+        <a href="{{ url_for('landing') }}#features" class="sf-link">Features</a>
+        <a href="{{ url_for('landing') }}#how-it-works" class="sf-link"
+          >How it works</a
+        >
+        <a href="{{ url_for('auth.register') }}" class="sf-link"
+          >Sign up free</a
+        >
+        <a href="{{ url_for('auth.login') }}" class="sf-link">Log in</a>
+      </div>
+    </div>
+
+    <!-- Company -->
+    <div>
+      <div class="sf-col-title">Company</div>
+      <div role="navigation" aria-label="Company" class="sf-col-links">
+        <a href="{{ url_for('about.about') }}" class="sf-link">About us</a>
+        <a href="{{ url_for('careers.careers') }}" class="sf-link">Careers</a>
+        <a href="{{ url_for('security.security') }}" class="sf-link"
+          >Security</a
+        >
+        <a href="{{ url_for('privacy.privacy') }}" class="sf-link"
+          >Privacy Policy</a
+        >
+        <a href="{{ url_for('legal.legal') }}" class="sf-link">Legal</a>
+      </div>
+    </div>
+
+    <!-- Support -->
+    <div>
+      <div class="sf-col-title">Support</div>
+      <div role="navigation" aria-label="Support" class="sf-col-links">
+        <a href="{{ url_for('contactus.contact') }}" class="sf-link"
+          >Contact Us</a
+        >
+        <a href="{{ url_for('support.support') }}" class="sf-link"
+          >Help &amp; FAQ</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-divider"></div>
+
+  <div class="sf-bottom">
+    <p class="sf-copy">© 2026 ScrumPM.</p>
+    <div role="navigation" aria-label="Legal" class="sf-legal-links">
+      <a href="{{ url_for('privacy.privacy') }}" class="sf-link">Privacy</a>
+      <a href="{{ url_for('legal.legal') }}" class="sf-link">Terms</a>
+      <a href="{{ url_for('security.security') }}" class="sf-link">Security</a>
+    </div>
+  </div>
+</footer>

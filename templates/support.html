@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support — ScrumPM</title>
+  <meta name="description" content="ScrumPM support — get help with your account, sprints, and project management." />
+  <meta name="theme-color" content="#001E2B" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="canonical" href="https://scrum-pm.up.railway.app/support" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--brand:#00ED64;--brand-d:#00684A;--brand-l:rgba(0,237,100,.12);--bg:#001E2B;--surface:#012433;--card:#0A2D3F;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#E8EDEB;--muted:#889397;--font:'Inter',-apple-system,sans-serif}
+    html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;background:rgba(1,36,51,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .nav-brand{font-size:18px;font-weight:800;letter-spacing:-.5px;text-decoration:none;color:var(--text)}.nav-brand span{color:var(--brand)}
+    .nav-actions{display:flex;gap:10px}
+    .btn-ghost{padding:7px 16px;border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s}.btn-ghost:hover{background:rgba(255,255,255,.05)}
+    .btn-solid{padding:7px 16px;background:var(--brand);border-radius:8px;font-size:13px;font-weight:700;color:#001E2B;text-decoration:none;transition:opacity .15s}.btn-solid:hover{opacity:.88}
+    .page{max-width:760px;margin:0 auto;padding:72px 24px 80px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;border:1px solid rgba(0,237,100,.3);background:rgba(0,237,100,.08);font-size:12px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:.07em;margin-bottom:20px}
+    h1{font-size:clamp(32px,5vw,48px);font-weight:800;letter-spacing:-.04em;margin-bottom:16px}
+    .lead{font-size:18px;color:var(--text);line-height:1.75;max-width:560px;margin-bottom:48px;opacity:.85}
+    .faq-list{display:flex;flex-direction:column;gap:12px;margin-bottom:40px}
+    .faq{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px 24px}
+    .faq h3{font-size:15px;font-weight:600;margin-bottom:8px}
+    .faq p{font-size:15px;color:var(--text);line-height:1.75;opacity:.82}
+    .contact-card{background:var(--card);border:1px solid rgba(0,237,100,.2);border-radius:12px;padding:32px;text-align:center}
+    .contact-card h2{font-size:20px;font-weight:700;margin-bottom:10px}
+    .contact-card p{font-size:16px;color:var(--text);margin-bottom:24px;line-height:1.75;opacity:.85}
+    .btn-cta{display:inline-block;padding:12px 28px;background:var(--brand);border-radius:8px;font-size:14px;font-weight:700;color:#001E2B;text-decoration:none;transition:opacity .15s}.btn-cta:hover{opacity:.88}
+
+    @media(max-width:600px){nav{padding:0 20px}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="{{ url_for('landing') }}" class="nav-brand">Scrum<span>PM</span></a>
+  <div class="nav-actions">
+    <a href="{{ url_for('auth.login') }}" class="btn-ghost">Log in</a>
+    <a href="{{ url_for('auth.register') }}" class="btn-solid">Get started</a>
+  </div>
+</nav>
+<div class="page">
+  <div class="eyebrow">🛟 Support</div>
+  <h1>How can we help?</h1>
+  <p class="lead">Answers to common questions. If you can't find what you need, reach out directly.</p>
+
+  <div class="faq-list">
+    <div class="faq"><h3>How do I create a sprint?</h3><p>Go to <strong>Sprint Config</strong> in the tab bar. At the top of the page you'll find the Sprints panel — enter a name, start date, end date, and goal, then click + Create Sprint.</p></div>
+    <div class="faq"><h3>How do I assign stories to a sprint?</h3><p>Open the <strong>Backlog</strong> page. Each story row has a sprint dropdown in the Sprint column. Select the sprint from the dropdown and it saves instantly.</p></div>
+    <div class="faq"><h3>Why can't I see my stories on the Sprint Board?</h3><p>Stories only appear on the Sprint Board if they have been assigned to a sprint. Use the sprint dropdown on the Backlog page to assign them.</p></div>
+    <div class="faq"><h3>How do I add sub-tasks to a story?</h3><p>On the Backlog page, click the ▶ arrow on the left of any story row to expand it. You'll see a task list where you can add, check, and delete tasks.</p></div>
+    <div class="faq"><h3>How do I switch between projects?</h3><p>Click the <strong>ScrumPM</strong> logo in the top-left navbar to go back to your project list, then select a different project.</p></div>
+    <div class="faq"><h3>How do I delete my account?</h3><p>Contact us using the form below and we'll remove your account and all associated data within 30 days.</p></div>
+  </div>
+
+  <div class="contact-card">
+    <h2>Still need help?</h2>
+    <p>Our team is happy to assist. Send us a message and we'll get back to you as soon as possible.</p>
+    <a href="{{ url_for('contactus.contact') }}" class="btn-cta">Contact us →</a>
+  </div>
+</div>
+{% include '_footer.html' %}
+</body>
+</html>

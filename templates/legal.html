@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legal — ScrumPM</title>
+  <meta name="description" content="ScrumPM Terms of Service and legal information." />
+  <meta name="theme-color" content="#001E2B" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="canonical" href="https://scrum-pm.up.railway.app/legal" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--brand:#00ED64;--brand-d:#00684A;--bg:#001E2B;--surface:#012433;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#E8EDEB;--muted:#889397;--font:'Inter',-apple-system,sans-serif}
+    html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;background:rgba(1,36,51,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .nav-brand{font-size:18px;font-weight:800;letter-spacing:-.5px;text-decoration:none;color:var(--text)}.nav-brand span{color:var(--brand)}
+    .nav-actions{display:flex;gap:10px}
+    .btn-ghost{padding:7px 16px;border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s}.btn-ghost:hover{background:rgba(255,255,255,.05)}
+    .btn-solid{padding:7px 16px;background:var(--brand);border-radius:8px;font-size:13px;font-weight:700;color:#001E2B;text-decoration:none;transition:opacity .15s}.btn-solid:hover{opacity:.88}
+    .page{max-width:720px;margin:0 auto;padding:72px 24px 80px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;border:1px solid rgba(0,237,100,.3);background:rgba(0,237,100,.08);font-size:12px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:.07em;margin-bottom:20px}
+    h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.04em;margin-bottom:8px}
+    .updated{font-size:13px;color:var(--muted);margin-bottom:40px}
+    h2{font-size:17px;font-weight:700;margin:36px 0 10px}
+    p,li{font-size:16px;color:var(--text);line-height:1.75;margin-bottom:12px;opacity:.85}
+    ul{padding-left:20px;margin-bottom:10px}
+
+    @media(max-width:600px){nav{padding:0 20px}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="{{ url_for('landing') }}" class="nav-brand">Scrum<span>PM</span></a>
+  <div class="nav-actions">
+    <a href="{{ url_for('auth.login') }}" class="btn-ghost">Log in</a>
+    <a href="{{ url_for('auth.register') }}" class="btn-solid">Get started</a>
+  </div>
+</nav>
+<div class="page">
+  <div class="eyebrow"> Legal</div>
+  <h1>Terms of Service</h1>
+  <p class="updated">Last updated: June 1, 2026</p>
+
+  <h2>1. Acceptance of terms</h2>
+  <p>By creating an account or using ScrumPM, you agree to these Terms of Service. If you do not agree, do not use the service.</p>
+
+  <h2>2. Use of the service</h2>
+  <p>ScrumPM is provided for legitimate project management purposes. You agree not to:</p>
+  <ul>
+    <li>Use the service for any unlawful purpose</li>
+    <li>Attempt to gain unauthorised access to other users' accounts or data</li>
+    <li>Upload malicious code, spam, or abusive content</li>
+    <li>Reverse-engineer or attempt to extract the source code</li>
+  </ul>
+
+  <h2>3. Account responsibility</h2>
+  <p>You are responsible for maintaining the confidentiality of your account credentials and for all activity that occurs under your account. Notify us immediately of any unauthorised use.</p>
+
+  <h2>4. Data ownership</h2>
+  <p>You retain ownership of all project data you create in ScrumPM. We do not claim any rights over your content. By using the service, you grant us the right to store and display your data to you through the platform.</p>
+
+  <h2>5. Service availability</h2>
+  <p>We strive for high availability but do not guarantee uninterrupted service. We reserve the right to modify, suspend, or discontinue any part of the service with reasonable notice.</p>
+
+  <h2>6. Limitation of liability</h2>
+  <p>ScrumPM is provided "as is" without warranties of any kind. We are not liable for any loss of data, business interruption, or consequential damages arising from your use of the service.</p>
+
+  <h2>7. Changes to terms</h2>
+  <p>We may update these terms from time to time. Continued use of ScrumPM after changes constitutes acceptance of the revised terms.</p>
+
+  <h2>8. Contact</h2>
+  <p>For legal enquiries, use the <a href="{{ url_for('contactus.contact') }}" style="color:var(--brand)">Contact Us</a> page.</p>
+</div>
+{% include '_footer.html' %}
+</body>
+</html>

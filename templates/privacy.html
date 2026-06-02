@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — ScrumPM</title>
+  <meta name="description" content="ScrumPM Privacy Policy — how we collect, use, and protect your data." />
+  <meta name="theme-color" content="#001E2B" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="canonical" href="https://scrum-pm.up.railway.app/privacy" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--brand:#00ED64;--brand-d:#00684A;--brand-l:rgba(0,237,100,.12);--bg:#001E2B;--surface:#012433;--card:#0A2D3F;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#E8EDEB;--muted:#889397;--font:'Inter',-apple-system,sans-serif}
+    html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;background:rgba(1,36,51,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .nav-brand{font-size:18px;font-weight:800;letter-spacing:-.5px;text-decoration:none;color:var(--text)}.nav-brand span{color:var(--brand)}
+    .nav-actions{display:flex;gap:10px}
+    .btn-ghost{padding:7px 16px;border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s}.btn-ghost:hover{background:rgba(255,255,255,.05)}
+    .btn-solid{padding:7px 16px;background:var(--brand);border-radius:8px;font-size:13px;font-weight:700;color:#001E2B;text-decoration:none;transition:opacity .15s}.btn-solid:hover{opacity:.88}
+    .page{max-width:720px;margin:0 auto;padding:72px 24px 80px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;border:1px solid rgba(0,237,100,.3);background:rgba(0,237,100,.08);font-size:12px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:.07em;margin-bottom:20px}
+    h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.04em;margin-bottom:8px}
+    .updated{font-size:13px;color:var(--muted);margin-bottom:40px}
+    h2{font-size:17px;font-weight:700;margin:36px 0 10px;color:var(--text)}
+    p,li{font-size:16px;color:var(--text);line-height:1.75;margin-bottom:12px;opacity:.85}
+    ul{padding-left:20px;margin-bottom:10px}
+    hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+
+    @media(max-width:600px){nav{padding:0 20px}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="{{ url_for('landing') }}" class="nav-brand">Scrum<span>PM</span></a>
+  <div class="nav-actions">
+    <a href="{{ url_for('auth.login') }}" class="btn-ghost">Log in</a>
+    <a href="{{ url_for('auth.register') }}" class="btn-solid">Get started</a>
+  </div>
+</nav>
+<div class="page">
+  <div class="eyebrow">🔒 Privacy</div>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: June 1, 2026</p>
+
+  <h2>1. Information we collect</h2>
+  <p>When you create an account, we collect your username, email address, and a hashed version of your password. We never store your password in plain text. When you use ScrumPM, we store the project data you create — stories, sprints, risks, team members, and related content.</p>
+
+  <h2>2. How we use your information</h2>
+  <ul>
+    <li>To provide and maintain your ScrumPM workspace</li>
+    <li>To authenticate you and protect your account</li>
+    <li>To prevent duplicate accounts via email uniqueness checks</li>
+    <li>To respond to support and contact form submissions</li>
+  </ul>
+
+  <h2>3. Data storage</h2>
+  <p>Your data is stored in MongoDB Atlas, a cloud-hosted database. Data is scoped strictly to your account — no other user can access your projects. We use compound unique indexes to enforce this at the database level.</p>
+
+  <h2>4. Cookies and sessions</h2>
+  <p>ScrumPM uses a single session cookie to keep you logged in. This cookie is HTTP-only (not accessible to JavaScript), uses SameSite=Lax to prevent cross-site request forgery, and is Secure when served over HTTPS.</p>
+
+  <h2>5. Data sharing</h2>
+  <p>We do not sell, rent, or share your personal data with third parties for marketing purposes. We use third-party infrastructure (MongoDB Atlas, Railway) to run the platform — these providers have their own privacy policies.</p>
+
+  <h2>6. Data deletion</h2>
+  <p>You can delete any project from the Projects page. To delete your account entirely, contact us at the address below and we will remove all associated data within 30 days.</p>
+
+  <h2>7. Contact</h2>
+  <p>For privacy questions, contact us via the <a href="{{ url_for('contactus.contact') }}" style="color:var(--brand)">Contact Us</a> page.</p>
+</div>
+{% include '_footer.html' %}
+</body>
+</html>

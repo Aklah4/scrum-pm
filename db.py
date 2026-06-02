@@ -10,6 +10,7 @@ db = client[os.getenv("DB_NAME")]
 
 users    = db["users"]
 projects = db["projects"]
+contactus = db["contactus"]
 
 # Compound unique index — one document per (user, project)
 projects.create_index([("username", 1), ("project_id", 1)], unique=True)

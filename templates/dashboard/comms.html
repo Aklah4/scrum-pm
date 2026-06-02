@@ -6,7 +6,7 @@
   <h1 class="page-title">Communication Plan</h1>
 </div>
 
-<form method="POST" action="{{ url_for('dashboard.comms_add') }}" class="add-form">
+<form method="POST" action="{{ url_for('comms.comms_add') }}" class="add-form">
   <input class="grow" name="stakeholder" placeholder="Stakeholder / audience" required />
   <select name="type">
     <option value="Email">Email</option>
@@ -81,7 +81,7 @@
         <td style="font-size:13px;color:var(--text-2)">{{ item.notes or "—" }}</td>
         <td>
           <form method="POST"
-                action="{{ url_for('dashboard.comms_delete', item_id=item.id) }}">
+                action="{{ url_for('comms.comms_delete', item_id=item.id) }}">
             <button type="submit" class="btn-del">Remove</button>
           </form>
         </td>

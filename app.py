@@ -15,11 +15,48 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"]   = os.getenv("RAILWAY_ENVIRONMENT") is not None
 
-from blueprints.auth import auth_bp
-from blueprints.dashboard import dashboard_bp
+from blueprints.auth      import auth_bp
+from blueprints.dashboard.projects import dashboard_bp
+from blueprints.contactus import contactus_bp
+from blueprints.about     import about_bp
+from blueprints.careers   import careers_bp
+from blueprints.legal     import legal_bp
+from blueprints.privacy   import privacy_bp
+from blueprints.security  import security_bp
+from blueprints.support   import support_bp
+from blueprints.dashboard.overview import overview_bp
+from blueprints.dashboard.stakeholder import stakeholder_bp
+from blueprints.dashboard.communication import comms_bp
+from blueprints.dashboard.sprint import sprint_bp
+from blueprints.dashboard.team import team_bp
+from blueprints.dashboard.backlog import backlog_bp
+from blueprints.dashboard.analytics import analytics_bp
+from blueprints.dashboard.dod import dod_bp
+from blueprints.dashboard.risks import risks_bp
+from blueprints.dashboard.retro import retro_bp
+from blueprints.dashboard.raci import raci_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(contactus_bp)
+app.register_blueprint(about_bp)
+app.register_blueprint(careers_bp)
+app.register_blueprint(legal_bp)
+app.register_blueprint(privacy_bp)
+app.register_blueprint(security_bp)
+app.register_blueprint(support_bp)
+app.register_blueprint(overview_bp)
+app.register_blueprint(team_bp)
+app.register_blueprint(stakeholder_bp)
+app.register_blueprint(sprint_bp)
+app.register_blueprint(backlog_bp)
+app.register_blueprint(analytics_bp)
+app.register_blueprint(comms_bp)
+app.register_blueprint(dod_bp)
+app.register_blueprint(risks_bp)
+app.register_blueprint(retro_bp)
+app.register_blueprint(raci_bp)
+
 
 
 @app.context_processor

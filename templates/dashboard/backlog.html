@@ -18,17 +18,17 @@
 {# ── Sprint filter pills ── #}
 {% if sprints %}
 <div class="sprint-filter-bar">
-  <a href="{{ url_for('dashboard.backlog') }}"
+  <a href="{{ url_for('backlog.backlog') }}"
      class="sprint-pill{% if not sprint_filter %} active{% endif %}">
     All <span class="pill-count">{{ data.stories | length }}</span>
   </a>
   {% for sp in sprints %}
-  <a href="{{ url_for('dashboard.backlog', sprint=sp.id) }}"
+  <a href="{{ url_for('backlog.backlog', sprint=sp.id) }}"
      class="sprint-pill{% if sprint_filter == sp.id %} active{% endif %}">
     {{ sp.name }} <span class="pill-count">{{ sprint_counts.get(sp.id, 0) }}</span>
   </a>
   {% endfor %}
-  <a href="{{ url_for('dashboard.backlog', sprint='__none__') }}"
+  <a href="{{ url_for('backlog.backlog', sprint='__none__') }}"
      class="sprint-pill{% if sprint_filter == '__none__' %} active{% endif %}">
     Unassigned <span class="pill-count">{{ sprint_counts.get('', 0) }}</span>
   </a>
@@ -36,7 +36,7 @@
 {% endif %}
 
 {# ── Add story form ── #}
-<form method="POST" action="{{ url_for('dashboard.backlog_add') }}" class="add-form">
+<form method="POST" action="{{ url_for('backlog.backlog_add') }}" class="add-form">
   <input id="story-title" class="grow" name="title"
          placeholder="As a [user], I want to [action] so that [benefit]" required />
   <select name="priority">
@@ -114,7 +114,7 @@
         {% if sprints %}
         <td>
           <form method="POST"
-                action="{{ url_for('dashboard.backlog_assign', story_id=story.id) }}">
+                action="{{ url_for('backlog.backlog_assign', story_id=story.id) }}">
             <select name="sprint_id" class="sprint-inline-select"
                     onchange="this.form.submit()">
               <option value="">— Unassigned —</option>
@@ -133,7 +133,7 @@
           <button type="button" class="btn-edit"
                   onclick="openEdit('{{ story.id }}','{{ story.title | replace("'", "\\'") }}','{{ story.priority }}','{{ story.pts }}','{{ story.sprint_id or "" }}')">Edit</button>
           <form method="POST"
-                action="{{ url_for('dashboard.backlog_delete', story_id=story.id) }}">
+                action="{{ url_for('backlog.backlog_delete', story_id=story.id) }}">
             <button type="submit" class="btn-del">Remove</button>
           </form>
         </td>
@@ -144,20 +144,20 @@
             {% for task in story_tasks %}
             <div class="task-item">
               <form method="POST"
-                    action="{{ url_for('dashboard.task_toggle', story_id=story.id, task_id=task.id) }}">
+                    action="{{ url_for('backlog.task_toggle', story_id=story.id, task_id=task.id) }}">
                 <button type="submit" class="task-check-btn{% if task.done %} checked{% endif %}">
                   {% if task.done %}✓{% endif %}
                 </button>
               </form>
               <span class="task-text{% if task.done %} task-struck{% endif %}">{{ task.text }}</span>
               <form method="POST"
-                    action="{{ url_for('dashboard.task_delete', story_id=story.id, task_id=task.id) }}">
+                    action="{{ url_for('backlog.task_delete', story_id=story.id, task_id=task.id) }}">
                 <button type="submit" class="task-x-btn">×</button>
               </form>
             </div>
             {% endfor %}
             <form method="POST"
-                  action="{{ url_for('dashboard.task_add', story_id=story.id) }}"
+                  action="{{ url_for('backlog.task_add', story_id=story.id) }}"
                   class="task-add-inline">
               <input name="text" placeholder="Add a task, e.g. Set up navbar component" required />
               <button type="submit" class="btn-add">+ Add task</button>

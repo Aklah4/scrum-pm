@@ -75,12 +75,16 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.65;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   transition: background 0.2s, color 0.2s;
 }
+
+p { font-size: 15px; line-height: 1.75; color: var(--text); }
+li { font-size: 15px; line-height: 1.75; }
 
 /* ── NAV ───────────────────────────────────────────────── */
 .navbar {

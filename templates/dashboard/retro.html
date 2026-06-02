@@ -19,7 +19,7 @@
     <div class="retro-item">
       <span>{{ item.text }}</span>
       <form method="POST"
-            action="{{ url_for('dashboard.retro_delete', col=col, item_id=item.id) }}"
+            action="{{ url_for('retro.retro_delete', col=col, item_id=item.id) }}"
             style="display:inline;flex-shrink:0">
         <button type="submit" class="btn-x">×</button>
       </form>
@@ -27,7 +27,7 @@
     {% endfor %}
 
     <form method="POST"
-          action="{{ url_for('dashboard.retro_add', col=col) }}"
+          action="{{ url_for('retro.retro_add', col=col) }}"
           class="retro-form">
       <input type="text" name="text" placeholder="Add item…" required />
       <button type="submit" class="btn-add" style="padding:7px 12px">+</button>

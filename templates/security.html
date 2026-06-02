@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security — ScrumPM</title>
+    <meta
+      name="description"
+      content="How ScrumPM keeps your data secure — authentication, encryption, and infrastructure."
+    />
+    <meta name="theme-color" content="#001E2B" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    />
+    <link rel="canonical" href="https://scrum-pm.up.railway.app/security" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --brand: #00ed64;
+        --brand-d: #00684a;
+        --brand-l: rgba(0, 237, 100, 0.12);
+        --bg: #001e2b;
+        --surface: #012433;
+        --card: #0a2d3f;
+        --border: rgba(255, 255, 255, 0.08);
+        --border2: rgba(255, 255, 255, 0.14);
+        --text: #e8edeb;
+        --muted: #889397;
+        --font: "Inter", -apple-system, sans-serif;
+      }
+      html,
+      body {
+        min-height: 100%;
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 48px;
+        height: 60px;
+        background: rgba(1, 36, 51, 0.88);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .nav-brand {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .nav-brand span {
+        color: var(--brand);
+      }
+      .nav-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .btn-ghost {
+        padding: 7px 16px;
+        border: 1px solid var(--border2);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        text-decoration: none;
+        transition: background 0.15s;
+      }
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .btn-solid {
+        padding: 7px 16px;
+        background: var(--brand);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #001e2b;
+        text-decoration: none;
+        transition: opacity 0.15s;
+      }
+      .btn-solid:hover {
+        opacity: 0.88;
+      }
+      .page {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 72px 24px 80px;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 237, 100, 0.3);
+        background: rgba(0, 237, 100, 0.08);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--brand);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 20px;
+      }
+      h1 {
+        font-size: clamp(32px, 5vw, 48px);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 16px;
+      }
+      .lead {
+        font-size: 18px;
+        color: var(--text);
+        line-height: 1.75;
+        max-width: 580px;
+        margin-bottom: 48px;
+        opacity: 0.85;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+      }
+      .card-icon {
+        font-size: 28px;
+        margin-bottom: 14px;
+      }
+      .card h2 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .card p {
+        font-size: 15px;
+        color: var(--text);
+        line-height: 1.75;
+        opacity: 0.85;
+      }
+      .report {
+        background: var(--card);
+        border: 1px solid rgba(0, 237, 100, 0.2);
+        border-radius: 12px;
+        padding: 28px;
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .report p {
+        font-size: 16px;
+        color: var(--text);
+        flex: 1;
+        line-height: 1.75;
+        opacity: 0.85;
+      }
+      .btn-report {
+        padding: 10px 22px;
+        background: var(--brand);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #001e2b;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: opacity 0.15s;
+      }
+      .btn-report:hover {
+        opacity: 0.88;
+      }
+
+      @media (max-width: 600px) {
+        nav {
+          padding: 0 20px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .report {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="{{ url_for('landing') }}" class="nav-brand"
+        >Scrum<span>PM</span></a
+      >
+      <div class="nav-actions">
+        <a href="{{ url_for('auth.login') }}" class="btn-ghost">Log in</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-solid"
+          >Get started</a
+        >
+      </div>
+    </nav>
+    <div class="page">
+      <div class="eyebrow">Security</div>
+      <h1>Security at ScrumPM</h1>
+      <p class="lead">
+        We take the security of your data seriously. Here's how we protect it.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">🔑</div>
+          <h2>Password security</h2>
+          <p>
+            Passwords are hashed using bcrypt with a unique salt per user. We
+            never store or log plain-text passwords.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🍪</div>
+          <h2>Secure sessions</h2>
+          <p>
+            Session cookies are HTTP-only, SameSite=Lax, and Secure over HTTPS
+            preventing XSS and CSRF attacks.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🏗️</div>
+          <h2>Data isolation</h2>
+          <p>
+            Every project is scoped to its owner via compound indexes. A user
+            can never access another user's data, even if they know a project
+            ID.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">✅</div>
+          <h2>Input validation</h2>
+          <p>
+            All user inputs are validated server-side. Email addresses are
+            verified against live DNS MX records at registration.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌐</div>
+          <h2>HTTPS everywhere</h2>
+          <p>
+            All traffic is served over HTTPS. Secure cookie flag is enforced
+            automatically in production.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-icon">☁️</div>
+          <h2>Cloud infrastructure</h2>
+          <p>
+            Hosted on secure infrastructure providing encryption at rest and in
+            transit as standard.
+          </p>
+        </div>
+      </div>
+      <div class="report">
+        <p>
+          Found a security vulnerability? Please report it responsibly via our
+          contact form and we'll respond promptly.
+        </p>
+        <a href="{{ url_for('contactus.contact') }}" class="btn-report"
+          >Report a vulnerability</a
+        >
+      </div>
+    </div>
+    {% include '_footer.html' %}
+  </body>
+</html>

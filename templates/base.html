@@ -47,30 +47,30 @@
 {# Tab bar only visible when a project is active #}
 {% if session.username and session.project_id %}
 <div class="tab-bar">
-  <a href="{{ url_for('dashboard.overview') }}"
-     class="tab {% if request.endpoint == 'dashboard.overview' %}active{% endif %}">Overview</a>
-  <a href="{{ url_for('dashboard.backlog') }}"
-     class="tab {% if request.endpoint == 'dashboard.backlog' %}active{% endif %}">Backlog</a>
-  <a href="{{ url_for('dashboard.sprint') }}"
-     class="tab {% if request.endpoint == 'dashboard.sprint' %}active{% endif %}">Sprint</a>
-  <a href="{{ url_for('dashboard.risks') }}"
-     class="tab {% if request.endpoint == 'dashboard.risks' %}active{% endif %}">Risks</a>
-  <a href="{{ url_for('dashboard.team') }}"
-     class="tab {% if request.endpoint == 'dashboard.team' %}active{% endif %}">Team</a>
-  <a href="{{ url_for('dashboard.dod') }}"
-     class="tab {% if request.endpoint == 'dashboard.dod' %}active{% endif %}">DoD</a>
-  <a href="{{ url_for('dashboard.retro') }}"
-     class="tab {% if request.endpoint == 'dashboard.retro' %}active{% endif %}">Retro</a>
-  <a href="{{ url_for('dashboard.comms') }}"
-     class="tab {% if request.endpoint == 'dashboard.comms' %}active{% endif %}">Comms Plan</a>
-  <a href="{{ url_for('dashboard.stakeholders') }}"
-     class="tab {% if request.endpoint == 'dashboard.stakeholders' %}active{% endif %}">Stakeholders</a>
-  <a href="{{ url_for('dashboard.raci') }}"
-     class="tab {% if request.endpoint == 'dashboard.raci' %}active{% endif %}">RACI</a>
-  <a href="{{ url_for('dashboard.sprint_config') }}"
-     class="tab {% if request.endpoint == 'dashboard.sprint_config' %}active{% endif %}">Sprint Config</a>
-  <a href="{{ url_for('dashboard.analytics') }}"
-     class="tab {% if request.endpoint == 'dashboard.analytics' %}active{% endif %}">Analytics</a>
+  <a href="{{ url_for('overview.overview') }}"
+     class="tab {% if request.endpoint == 'overview.overview' %}active{% endif %}">Overview</a>
+  <a href="{{ url_for('backlog.backlog') }}"
+     class="tab {% if request.endpoint == 'backlog.backlog' %}active{% endif %}">Backlog</a>
+  <a href="{{ url_for('sprint.sprint') }}"
+     class="tab {% if request.endpoint == 'sprint.sprint' %}active{% endif %}">Sprint</a>
+  <a href="{{ url_for('risks.risks') }}"
+     class="tab {% if request.endpoint == 'risks.risks' %}active{% endif %}">Risks</a>
+  <a href="{{ url_for('team.team') }}"
+     class="tab {% if request.endpoint == 'team.team' %}active{% endif %}">Team</a>
+  <a href="{{ url_for('dod.dod') }}"
+     class="tab {% if request.endpoint == 'dod.dod' %}active{% endif %}">DoD</a>
+  <a href="{{ url_for('retro.retro') }}"
+     class="tab {% if request.endpoint == 'retro.retro' %}active{% endif %}">Retro</a>
+  <a href="{{ url_for('comms.comms') }}"
+     class="tab {% if request.endpoint == 'comms.comms' %}active{% endif %}">Comms Plan</a>
+  <a href="{{ url_for('stakeholder.stakeholders') }}"
+     class="tab {% if request.endpoint == 'stakeholder.stakeholders' %}active{% endif %}">Stakeholders</a>
+  <a href="{{ url_for('raci.raci') }}"
+     class="tab {% if request.endpoint == 'raci.raci' %}active{% endif %}">RACI</a>
+  <a href="{{ url_for('sprint.sprint_config') }}"
+     class="tab {% if request.endpoint == 'sprint.sprint_config' %}active{% endif %}">Sprint Config</a>
+  <a href="{{ url_for('analytics.analytics') }}"
+     class="tab {% if request.endpoint == 'analytics.analytics' %}active{% endif %}">Analytics</a>
 </div>
 {% endif %}
 

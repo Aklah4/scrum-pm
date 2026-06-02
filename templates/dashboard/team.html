@@ -63,7 +63,7 @@
         </td>
         <td>
           <form method="POST"
-                action="{{ url_for('dashboard.team_delete', member_id=member.id) }}">
+                action="{{ url_for('team.team_delete', member_id=member.id) }}">
             <button type="submit" class="btn-del">Remove</button>
           </form>
         </td>
@@ -76,7 +76,7 @@
   </table>
 </div>
 
-<form method="POST" action="{{ url_for('dashboard.team_add') }}" class="add-form">
+<form method="POST" action="{{ url_for('team.team_add') }}" class="add-form">
   <input class="grow" name="name" placeholder="Full name" required />
   <select name="role">
     <option>Product Owner</option>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us — ScrumPM</title>
+  <meta name="description"  content="Get in touch with the ScrumPM team. We'd love to hear from you." />
+  <meta name="robots"       content="index, follow" />
+  <meta name="theme-color"  content="#001E2B" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand:   #00ED64;
+      --brand-d: #00684A;
+      --brand-l: rgba(0,237,100,.12);
+      --bg:      #001E2B;
+      --surface: #012433;
+      --card:    #0A2D3F;
+      --border:  rgba(255,255,255,.08);
+      --border2: rgba(255,255,255,.14);
+      --text:    #E8EDEB;
+      --muted:   #889397;
+      --font:    'Inter', -apple-system, sans-serif;
+    }
+    html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+    /* Nav */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 60px;
+      background: rgba(1,36,51,.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { font-size: 18px; font-weight: 800; letter-spacing: -.5px; text-decoration: none; color: var(--text); }
+    .nav-brand span { color: var(--brand); }
+    .nav-actions { display: flex; gap: 10px; }
+    .btn-ghost { padding: 7px 16px; border: 1px solid var(--border2); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; transition: background .15s; }
+    .btn-ghost:hover { background: rgba(255,255,255,.05); }
+    .btn-solid { padding: 7px 16px; background: var(--brand); border-radius: 8px; font-size: 13px; font-weight: 700; color: #001E2B; text-decoration: none; transition: opacity .15s; }
+    .btn-solid:hover { opacity: .88; }
+
+    /* Page */
+    .page { display: flex; flex-direction: column; align-items: center; padding: 72px 24px 80px; }
+    .page-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 5px 14px; border-radius: 20px;
+      border: 1px solid rgba(0,237,100,.3); background: rgba(0,237,100,.08);
+      font-size: 12px; font-weight: 600; color: var(--brand);
+      text-transform: uppercase; letter-spacing: .07em; margin-bottom: 20px;
+    }
+    .page h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; letter-spacing: -.03em; text-align: center; margin-bottom: 12px; }
+    .page-sub { font-size: 17px; color: var(--text); text-align: center; max-width: 460px; line-height: 1.75; margin-bottom: 48px; opacity: .85; }
+
+    /* Form card */
+    .form-card {
+      width: 100%; max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    }
+
+    .alert {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 500; margin-bottom: 24px;
+    }
+    .alert-success { background: rgba(0,237,100,.1); border: 1px solid rgba(0,237,100,.25); color: var(--brand); }
+    .alert-error   { background: rgba(226,68,92,.1);  border: 1px solid rgba(226,68,92,.25);  color: #ff6b80; }
+
+    .field { margin-bottom: 20px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; letter-spacing: .01em; }
+    .field input,
+    .field textarea {
+      width: 100%; padding: 11px 14px;
+      background: var(--card); border: 1px solid var(--border2);
+      border-radius: 8px; font-size: 14px; font-family: var(--font);
+      color: var(--text); outline: none; resize: vertical;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: var(--muted); }
+    .field input:focus,
+    .field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(0,237,100,.15); }
+
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: var(--brand); border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 700; font-family: var(--font);
+      color: #001E2B; cursor: pointer;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+    }
+    .btn-submit:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,237,100,.25); }
+
+    /* Back link */
+    .back-link { margin-top: 28px; font-size: 13px; color: var(--muted); }
+    .back-link a { color: var(--brand); font-weight: 500; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .form-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('landing') }}" class="nav-brand">Scrum<span>PM</span></a>
+  <div class="nav-actions">
+    <a href="{{ url_for('auth.login') }}"    class="btn-ghost">Log in</a>
+    <a href="{{ url_for('auth.register') }}" class="btn-solid">Get started</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-eyebrow">✉ Get in touch</div>
+  <h1>Contact Us</h1>
+  <p class="page-sub">Have a question, feedback, or just want to say hello? Fill in the form below and we'll get back to you.</p>
+
+  <div class="form-card">
+
+    {% if success %}
+    <div class="alert alert-success">
+      ✓ Message sent! We'll get back to you shortly.
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-error">
+      ⚠ {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" novalidate>
+      <div class="field">
+        <label for="name">Full name</label>
+        <input id="name" type="text" name="name" placeholder="Your name" required />
+      </div>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" type="email" name="email" placeholder="you@example.com" required />
+      </div>
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" placeholder="Write your message here…" required></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Send message →</button>
+    </form>
+
+  </div>
+
+  <p class="back-link">← <a href="{{ url_for('landing') }}">Back to home</a></p>
+</div>
+
+{% include '_footer.html' %}
+</body>
+</html>

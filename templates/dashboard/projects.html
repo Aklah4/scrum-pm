@@ -59,7 +59,7 @@
       <div class="project-card-actions">
         {% if is_active %}
           <span class="proj-badge-active">● Active</span>
-          <a href="{{ url_for('dashboard.overview') }}" class="btn-add">Open →</a>
+          <a href="{{ url_for('overview.overview') }}" class="btn-add">Open →</a>
         {% else %}
           <form method="POST"
                 action="{{ url_for('dashboard.projects_switch', project_id=p.project_id) }}">

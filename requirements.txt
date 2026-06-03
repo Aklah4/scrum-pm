@@ -6,4 +6,4 @@ gunicorn
 dnspython
 email-validator
 flask-limiter
-flask-mail
+resend

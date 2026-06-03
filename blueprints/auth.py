@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for, flash
+from flask import Blueprint, render_template, request, session, redirect, url_for, flash, current_app
 from db import users
-from extensions import limiter, mail, serializer
+from extensions import limiter, serializer
 from email_validator import validate_email, EmailNotValidError
 from itsdangerous import SignatureExpired, BadSignature
-from flask_mail import Message
 from datetime import datetime
+import resend
+import os
 import bcrypt
 
 auth_bp = Blueprint("auth", __name__)
@@ -87,22 +88,22 @@ def forgot_password():
             token     = serializer.dumps(email, salt="password-reset")
             reset_url = url_for("auth.reset_password", token=token, _external=True)
 
-            msg      = Message(
-                subject="Reset your ScrumPM password",
-                recipients=[email]
-            )
-            msg.body = (
-                f"Hi,\n\n"
-                f"You requested a password reset for your ScrumPM account.\n\n"
-                f"Click the link below to reset your password (expires in 30 minutes):\n\n"
-                f"{reset_url}\n\n"
-                f"If you didn't request this, ignore this email — your password won't change.\n\n"
-                f"The ScrumPM Team"
-            )
             try:
-                mail.send(msg)
+                resend.api_key = os.getenv("RESEND_API_KEY")
+                resend.Emails.send({
+                    "from": "ScrumPM <support@scrumpm.online>",
+                    "to":   [email],
+                    "subject": "Reset your ScrumPM password",
+                    "text": (
+                        f"Hi,\n\n"
+                        f"You requested a password reset for your ScrumPM account.\n\n"
+                        f"Click the link below to reset your password (expires in 30 minutes):\n\n"
+                        f"{reset_url}\n\n"
+                        f"If you didn't request this, ignore this email — your password won't change.\n\n"
+                        f"— The ScrumPM Team"
+                    ),
+                })
             except Exception as e:
-                from flask import current_app
                 current_app.logger.error(f"Password reset email failed: {e}")
                 flash(f"Could not send email: {e}", "error")
                 return render_template("auth/forgot_password.html")

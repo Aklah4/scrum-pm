@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, render_template
+from flask import Flask, session, redirect, url_for, render_template, make_response
 from dotenv import load_dotenv
 import os
 
@@ -85,6 +85,42 @@ def landing():
     if "username" in session:
         return redirect(url_for("dashboard.projects_home"))
     return render_template("landing.html")
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    pages = [
+        url_for("landing",          _external=True),
+        url_for("about.about",      _external=True),
+        url_for("careers.careers",  _external=True),
+        url_for("contactus.contact",_external=True),
+        url_for("support.support",  _external=True),
+        url_for("auth.login",       _external=True),
+        url_for("auth.register",    _external=True),
+    ]
+    xml  = '<?xml version="1.0" encoding="UTF-8"?>'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    for page in pages:
+        xml += f"<url><loc>{page}</loc></url>"
+    xml += "</urlset>"
+    response = make_response(xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+
+@app.route("/robots.txt")
+def robots():
+    content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /dashboard/\n"
+        "Disallow: /projects/\n"
+        "\n"
+        "Sitemap: https://scrumpm.online/sitemap.xml\n"
+    )
+    response = make_response(content)
+    response.headers["Content-Type"] = "text/plain"
+    return response
 
 
 if __name__ == "__main__":

@@ -88,6 +88,7 @@ def landing():
 
 
 @app.route("/sitemap.xml")
+@limiter.exempt
 def sitemap():
     base = "https://scrumpm.online"
     pages = [
@@ -108,6 +109,7 @@ def sitemap():
 
 
 @app.route("/robots.txt")
+@limiter.exempt
 def robots():
     content = (
         "User-agent: *\n"

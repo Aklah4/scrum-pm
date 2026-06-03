@@ -89,19 +89,20 @@ def landing():
 
 @app.route("/sitemap.xml")
 def sitemap():
+    base = "https://scrumpm.online"
     pages = [
-        url_for("landing",          _external=True),
-        url_for("about.about",      _external=True),
-        url_for("careers.careers",  _external=True),
-        url_for("contactus.contact",_external=True),
-        url_for("support.support",  _external=True),
-        url_for("auth.login",       _external=True),
-        url_for("auth.register",    _external=True),
+        "/",
+        "/about",
+        "/careers",
+        "/contact",
+        "/support",
+        "/login",
+        "/register",
     ]
     xml  = '<?xml version="1.0" encoding="UTF-8"?>'
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-    for page in pages:
-        xml += f"<url><loc>{page}</loc></url>"
+    for path in pages:
+        xml += f"<url><loc>{base}{path}</loc></url>"
     xml += "</urlset>"
     response = make_response(xml)
     response.headers["Content-Type"] = "application/xml"

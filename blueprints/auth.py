@@ -99,8 +99,8 @@ def forgot_password():
                         f"You requested a password reset for your ScrumPM account.\n\n"
                         f"Click the link below to reset your password (expires in 30 minutes):\n\n"
                         f"{reset_url}\n\n"
-                        f"If you didn't request this, ignore this email — your password won't change.\n\n"
-                        f"— The ScrumPM Team"
+                        f"If you didn't request this, ignore this email your password won't change.\n\n"
+                        f"The ScrumPM Team"
                     ),
                 })
             except Exception as e:

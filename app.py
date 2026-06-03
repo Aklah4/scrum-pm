@@ -9,6 +9,15 @@ app.secret_key = os.getenv("SECRET_KEY")
 if not app.secret_key:
     raise ValueError("SECRET_KEY environment variable is not set")
 
+
+app.config["MAIL_SERVER"]         = os.getenv("MAIL_SERVER")
+app.config["MAIL_PORT"]           = int(os.getenv("MAIL_PORT", 587))
+app.config["MAIL_USE_TLS"]        = os.getenv("MAIL_USE_TLS", "True") == "True"
+app.config["MAIL_USE_SSL"]        = os.getenv("MAIL_USE_SSL", "False") == "True"
+app.config["MAIL_USERNAME"]       = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"]       = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER")
+
 # Harden session cookies.
 # SESSION_COOKIE_SECURE is only enabled when running on Railway (HTTPS).
 app.config["SESSION_COOKIE_HTTPONLY"] = True
@@ -35,10 +44,10 @@ from blueprints.dashboard.dod import dod_bp
 from blueprints.dashboard.risks import risks_bp
 from blueprints.dashboard.retro import retro_bp
 from blueprints.dashboard.raci import raci_bp
-from extensions import limiter
-
+from extensions import limiter, mail
 
 limiter.init_app(app)
+mail.init_app(app)
 
 
 

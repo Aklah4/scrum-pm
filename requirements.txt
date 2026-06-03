@@ -5,5 +5,5 @@ bcrypt
 gunicorn
 dnspython
 email-validator
-flask-limiter
+flask-limiter[mongodb]
 resend

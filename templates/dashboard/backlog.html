@@ -9,9 +9,34 @@
   <div class="toolbar">
     <button class="btn-new" type="button"
             onclick="focusAddForm('story-title')">+ New story</button>
-    <button class="toolbar-btn">⊞ Filter</button>
-    <button class="toolbar-btn">↕ Sort</button>
-    <button class="toolbar-btn">⊟ Group by</button>
+    <div class="tb-dropdown">
+      <button class="toolbar-btn" onclick="toggleDrop('drop-filter')">⊞ Filter</button>
+      <div id="drop-filter" class="tb-drop-panel" style="display:none">
+        <label class="tb-drop-label">Priority</label>
+        <label class="tb-check"><input type="checkbox" value="high" checked onchange="applyFilters()"> High</label>
+        <label class="tb-check"><input type="checkbox" value="med"  checked onchange="applyFilters()"> Medium</label>
+        <label class="tb-check"><input type="checkbox" value="low"  checked onchange="applyFilters()"> Low</label>
+      </div>
+    </div>
+    <div class="tb-dropdown">
+      <button class="toolbar-btn" onclick="toggleDrop('drop-sort')">↕ Sort</button>
+      <div id="drop-sort" class="tb-drop-panel" style="display:none">
+        <label class="tb-drop-label">Sort by</label>
+        <button class="tb-drop-item" onclick="applySort('priority-asc')">Priority (High first)</button>
+        <button class="tb-drop-item" onclick="applySort('priority-desc')">Priority (Low first)</button>
+        <button class="tb-drop-item" onclick="applySort('pts-desc')">Points (High first)</button>
+        <button class="tb-drop-item" onclick="applySort('pts-asc')">Points (Low first)</button>
+        <button class="tb-drop-item" onclick="applySort('default')">Default order</button>
+      </div>
+    </div>
+    <div class="tb-dropdown">
+      <button class="toolbar-btn" onclick="toggleDrop('drop-group')">⊟ Group by</button>
+      <div id="drop-group" class="tb-drop-panel" style="display:none">
+        <label class="tb-drop-label">Group by</label>
+        <button class="tb-drop-item" onclick="applyGroup('none')">None</button>
+        <button class="tb-drop-item" onclick="applyGroup('priority')">Priority</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -83,11 +108,11 @@
         <th style="width:120px"></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="story-tbody">
       {% for story in filtered_stories %}
       {% set story_tasks = story.tasks | default([]) %}
       {% set tasks_done  = story_tasks | selectattr('done') | list | length %}
-      <tr>
+      <tr data-priority="{{ story.priority }}" data-pts="{{ story.pts }}">
         <td>
           <button type="button" class="expand-btn"
                   onclick="toggleTasks('{{ story.id }}')">
@@ -506,5 +531,93 @@ function closeEditDirect() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeEditDirect();
 });
+
+// ── Toolbar dropdowns ──────────────────────────────────────
+function toggleDrop(id) {
+  var panels = document.querySelectorAll('.tb-drop-panel');
+  panels.forEach(function(p) { if (p.id !== id) p.style.display = 'none'; });
+  var el = document.getElementById(id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.tb-dropdown')) {
+    document.querySelectorAll('.tb-drop-panel').forEach(function(p) { p.style.display = 'none'; });
+  }
+});
+
+var _origOrder = null;
+
+function storyRows() {
+  return Array.from(document.querySelectorAll('#story-tbody tr[data-priority]'));
+}
+
+function applyFilters() {
+  var checked = Array.from(document.querySelectorAll('#drop-filter input:checked')).map(function(c) { return c.value; });
+  storyRows().forEach(function(tr) {
+    var sub = document.getElementById('tasks-row-' + tr.querySelector('.expand-btn span').id.replace('chv-',''));
+    var show = checked.includes(tr.dataset.priority);
+    tr.style.display = show ? '' : 'none';
+    if (sub) sub.style.display = 'none';
+  });
+}
+
+var _priorityOrder = { high: 0, med: 1, low: 2 };
+
+function applySort(mode) {
+  var tbody = document.getElementById('story-tbody');
+  var rows  = storyRows();
+  if (!_origOrder) _origOrder = rows.map(function(r) { return r; });
+  var sorted;
+  if (mode === 'default') {
+    sorted = _origOrder.slice();
+  } else {
+    sorted = rows.slice().sort(function(a, b) {
+      if (mode === 'priority-asc')  return _priorityOrder[a.dataset.priority] - _priorityOrder[b.dataset.priority];
+      if (mode === 'priority-desc') return _priorityOrder[b.dataset.priority] - _priorityOrder[a.dataset.priority];
+      if (mode === 'pts-desc')      return parseInt(b.dataset.pts) - parseInt(a.dataset.pts);
+      if (mode === 'pts-asc')       return parseInt(a.dataset.pts) - parseInt(b.dataset.pts);
+    });
+  }
+  sorted.forEach(function(tr) { tbody.appendChild(tr); });
+  document.getElementById('drop-sort').style.display = 'none';
+}
+
+function applyGroup(mode) {
+  var tbody  = document.getElementById('story-tbody');
+  var rows   = storyRows();
+  var groups = mode === 'priority' ? ['high','med','low'] : [null];
+  var dividers = tbody.querySelectorAll('.group-divider-row');
+  dividers.forEach(function(d) { d.remove(); });
+  if (mode === 'none') { document.getElementById('drop-group').style.display = 'none'; return; }
+  groups.forEach(function(g) {
+    var label = { high:'High Priority', med:'Medium Priority', low:'Low Priority' }[g];
+    var div = document.createElement('tr');
+    div.className = 'group-divider-row';
+    div.innerHTML = '<td colspan="99" style="padding:8px 12px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);background:var(--surface2);border-top:1px solid var(--border)">' + label + '</td>';
+    tbody.appendChild(div);
+    rows.filter(function(r) { return r.dataset.priority === g; }).forEach(function(r) { tbody.appendChild(r); });
+  });
+  document.getElementById('drop-group').style.display = 'none';
+}
 </script>
+
+<style>
+.tb-dropdown { position: relative; }
+.tb-drop-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  background: var(--card, #0a2d3f);
+  border: 1px solid var(--border2, rgba(255,255,255,.14));
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+.tb-drop-label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-2, #889397); margin-bottom: 8px; }
+.tb-check { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text, #e8edeb); padding: 4px 2px; cursor: pointer; }
+.tb-drop-item { display: block; width: 100%; text-align: left; background: none; border: none; padding: 7px 8px; font-size: 13px; color: var(--text, #e8edeb); cursor: pointer; border-radius: 5px; font-family: inherit; }
+.tb-drop-item:hover { background: rgba(255,255,255,.06); }
+</style>
 {% endblock %}

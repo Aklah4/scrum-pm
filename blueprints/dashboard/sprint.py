@@ -27,6 +27,23 @@ def sprints_add():
     return redirect(url_for("sprint.sprint_config"))
 
 
+@sprint_bp.route("/sprints/edit/<sprint_id>", methods=["POST"])
+@project_required
+def sprints_edit(sprint_id):
+    username, pid = session["username"], session["project_id"]
+    data         = get_project(username, pid)
+    sprints_list = data.get("sprints", [])
+    for sp in sprints_list:
+        if sp["id"] == sprint_id:
+            sp["name"]       = request.form.get("name", sp["name"]).strip()
+            sp["start_date"] = request.form.get("start_date", sp.get("start_date", "")).strip()
+            sp["end_date"]   = request.form.get("end_date",   sp.get("end_date",   "")).strip()
+            sp["goal"]       = request.form.get("goal",       sp.get("goal",       "")).strip()
+            break
+    _save(username, pid, {"sprints": sprints_list})
+    return redirect(url_for("sprint.sprint_config"))
+
+
 @sprint_bp.route("/sprints/delete/<sprint_id>", methods=["POST"])
 @project_required
 def sprints_delete(sprint_id):

@@ -48,10 +48,20 @@
         <span style="font-size:12px;color:var(--text-2);font-style:italic">{{ sp.goal }}</span>
         {% endif %}
       </div>
-      <form method="POST"
-            action="{{ url_for('sprint.sprints_delete', sprint_id=sp.id) }}">
-        <button type="submit" class="btn-del">Remove</button>
-      </form>
+      <div style="display:flex;gap:6px">
+        <button type="button" class="btn-edit"
+                onclick="openSprintEdit(
+                  '{{ url_for('sprint.sprints_edit', sprint_id=sp.id) }}',
+                  '{{ sp.name | replace("'","\\'") }}',
+                  '{{ sp.start_date or '' }}',
+                  '{{ sp.end_date or '' }}',
+                  '{{ sp.goal | replace("'","\\'") if sp.goal else '' }}'
+                )">Edit</button>
+        <form method="POST"
+              action="{{ url_for('sprint.sprints_delete', sprint_id=sp.id) }}">
+          <button type="submit" class="btn-del">Remove</button>
+        </form>
+      </div>
     </div>
     {% endfor %}
   </div>
@@ -170,4 +180,76 @@
 
   <button type="submit" class="btn-add">Save configuration</button>
 </form>
+
+{# ── Sprint edit modal ── #}
+<div id="sprint-edit-overlay" class="edit-overlay" onclick="closeSprintEdit(event)">
+  <div class="edit-modal">
+    <h3 class="edit-modal-title">Edit Sprint</h3>
+    <form id="sprint-edit-form" method="POST">
+      <div class="edit-row">
+        <div class="edit-field" style="flex:2">
+          <label class="edit-label">Sprint name</label>
+          <input id="se-name" name="name" type="text" class="edit-input" required />
+        </div>
+      </div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Start date</label>
+          <input id="se-start" name="start_date" type="date" class="edit-input" />
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">End date</label>
+          <input id="se-end" name="end_date" type="date" class="edit-input" />
+        </div>
+      </div>
+      <div class="edit-field" style="margin-bottom:20px">
+        <label class="edit-label">Sprint goal</label>
+        <input id="se-goal" name="goal" type="text" class="edit-input"
+               placeholder="What should this sprint achieve?" />
+      </div>
+      <div class="edit-actions">
+        <button type="button" class="btn-cancel" onclick="closeSprintEditDirect()">Cancel</button>
+        <button type="submit" class="btn-save">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.btn-edit { background: none; border: 1px solid var(--border, #e0e0e0); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: var(--fg, #333); white-space: nowrap; }
+.btn-edit:hover { background: var(--hover-bg, rgba(255,255,255,.06)); }
+.edit-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; align-items: center; justify-content: center; }
+.edit-overlay.open { display: flex; }
+.edit-modal { background: var(--card-bg, #0a2d3f); border: 1px solid var(--border, #e0e0e0); border-radius: 10px; padding: 28px 32px; width: min(540px, 95vw); box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+.edit-modal-title { margin: 0 0 18px; font-size: 16px; font-weight: 600; color: var(--fg, #e8edeb); }
+.edit-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2, #889397); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+.edit-row { display: flex; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.edit-field { flex: 1; min-width: 120px; }
+.edit-input { width: 100%; box-sizing: border-box; padding: 8px 12px; border: 1px solid var(--border, #e0e0e0); border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text, #e8edeb); background: var(--surface2, #0d3348); }
+.edit-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.btn-cancel { background: none; border: 1px solid var(--border, #e0e0e0); border-radius: 6px; padding: 8px 18px; font-size: 14px; cursor: pointer; color: var(--text, #e8edeb); }
+.btn-cancel:hover { background: rgba(255,255,255,.05); }
+.btn-save { background: var(--brand, #00ed64); border: none; border-radius: 6px; padding: 8px 20px; font-size: 14px; font-weight: 600; cursor: pointer; color: #001e2b; }
+.btn-save:hover { opacity: .88; }
+</style>
+
+<script>
+function openSprintEdit(editUrl, name, start, end, goal) {
+  document.getElementById('sprint-edit-form').action = editUrl;
+  document.getElementById('se-name').value  = name;
+  document.getElementById('se-start').value = start;
+  document.getElementById('se-end').value   = end;
+  document.getElementById('se-goal').value  = goal;
+  document.getElementById('sprint-edit-overlay').classList.add('open');
+}
+function closeSprintEdit(e) {
+  if (e.target === document.getElementById('sprint-edit-overlay')) closeSprintEditDirect();
+}
+function closeSprintEditDirect() {
+  document.getElementById('sprint-edit-overlay').classList.remove('open');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSprintEditDirect();
+});
+</script>
 {% endblock %}

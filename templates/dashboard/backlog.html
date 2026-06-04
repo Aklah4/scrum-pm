@@ -131,7 +131,7 @@
         <td><span class="pts-badge">{{ story.pts }} pts</span></td>
         <td style="display:flex;gap:6px;align-items:center">
           <button type="button" class="btn-edit"
-                  onclick="openEdit('{{ story.id }}','{{ story.title | replace("'", "\\'") }}','{{ story.priority }}','{{ story.pts }}','{{ story.sprint_id or "" }}')">Edit</button>
+                  onclick="openEdit('{{ url_for('backlog.backlog_edit', story_id=story.id) }}','{{ story.title | replace("'", "\\'") }}','{{ story.priority }}','{{ story.pts }}','{{ story.sprint_id or "" }}')">Edit</button>
           <form method="POST"
                 action="{{ url_for('backlog.backlog_delete', story_id=story.id) }}">
             <button type="submit" class="btn-del">Remove</button>
@@ -488,8 +488,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-function openEdit(id, title, priority, pts, sprintId) {
-  document.getElementById('edit-form').action = '/backlog/edit/' + id;
+function openEdit(editUrl, title, priority, pts, sprintId) {
+  document.getElementById('edit-form').action = editUrl;
   document.getElementById('edit-title').value = title;
   document.getElementById('edit-priority').value = priority;
   document.getElementById('edit-pts').value = pts;

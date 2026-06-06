@@ -7,17 +7,10 @@
   <meta name="theme-color" content="#001E2B" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
   <link rel="canonical" href="https://scrum-pm.up.railway.app/about" />
-  <style>{% include '_page_style.html' ignore missing %}</style>
-  {% include '_page_nav_style.html' ignore missing %}
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--brand:#00ED64;--brand-d:#00684A;--brand-l:rgba(0,237,100,.12);--bg:#001E2B;--surface:#012433;--card:#0A2D3F;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#E8EDEB;--muted:#889397;--font:'Inter',-apple-system,sans-serif}
     html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;background:rgba(1,36,51,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-    .nav-brand{font-size:18px;font-weight:800;letter-spacing:-.5px;text-decoration:none;color:var(--text)}.nav-brand span{color:var(--brand)}
-    .nav-actions{display:flex;gap:10px}
-    .btn-ghost{padding:7px 16px;border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s}.btn-ghost:hover{background:rgba(255,255,255,.05)}
-    .btn-solid{padding:7px 16px;background:var(--brand);border-radius:8px;font-size:13px;font-weight:700;color:#001E2B;text-decoration:none;transition:opacity .15s}.btn-solid:hover{opacity:.88}
     .page{max-width:760px;margin:0 auto;padding:72px 24px 80px}
     .eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;border:1px solid rgba(0,237,100,.3);background:rgba(0,237,100,.08);font-size:12px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:.07em;margin-bottom:20px}
     h1{font-size:clamp(32px,5vw,48px);font-weight:800;letter-spacing:-.04em;margin-bottom:16px;line-height:1.1}
@@ -26,20 +19,13 @@
     .card h2{font-size:18px;font-weight:700;margin-bottom:10px;letter-spacing:-.02em}
     .card p{font-size:16px;color:var(--text);line-height:1.75;opacity:.85}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-
-    @media(max-width:600px){nav{padding:0 20px}.grid{grid-template-columns:1fr}}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-<nav>
-  <a href="{{ url_for('landing') }}" class="nav-brand">Scrum<span>PM</span></a>
-  <div class="nav-actions">
-    <a href="{{ url_for('auth.login') }}" class="btn-ghost">Log in</a>
-    <a href="{{ url_for('auth.register') }}" class="btn-solid">Get started</a>
-  </div>
-</nav>
+{% include '_public_nav.html' %}
 <div class="page">
-  <div class="eyebrow">🏢 About us</div>
+  <div class="eyebrow">About us</div>
   <h1>Built for teams that ship</h1>
   <p class="lead">ScrumPM was built to give agile teams a single, focused place to plan, track, and ship — without the bloat of enterprise tools or the chaos of spreadsheets.</p>
   <div class="card">
@@ -48,19 +34,19 @@
   </div>
   <div class="grid">
     <div class="card">
-      <h2>🎯 Product-first</h2>
+      <h2>Product-first</h2>
       <p>Every feature we build serves one goal: helping your team deliver better software, faster.</p>
     </div>
     <div class="card">
-      <h2>🔒 Private by design</h2>
+      <h2>Private by design</h2>
       <p>Your project data is yours. Every project is scoped to your account and never shared across users.</p>
     </div>
     <div class="card">
-      <h2>⚡ Built on modern tech</h2>
+      <h2>Built on modern tech</h2>
       <p>Flask, MongoDB Atlas, and Railway — fast, reliable infrastructure that scales with your team.</p>
     </div>
     <div class="card">
-      <h2>🌍 Remote-ready</h2>
+      <h2>Remote-ready</h2>
       <p>Browser-based, no installs, no VPNs. Your whole team can access ScrumPM from anywhere.</p>
     </div>
   </div>

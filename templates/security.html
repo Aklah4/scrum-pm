@@ -43,59 +43,6 @@
         color: var(--text);
         -webkit-font-smoothing: antialiased;
       }
-      nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 48px;
-        height: 60px;
-        background: rgba(1, 36, 51, 0.88);
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid var(--border);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-      }
-      .nav-brand {
-        font-size: 18px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        text-decoration: none;
-        color: var(--text);
-      }
-      .nav-brand span {
-        color: var(--brand);
-      }
-      .nav-actions {
-        display: flex;
-        gap: 10px;
-      }
-      .btn-ghost {
-        padding: 7px 16px;
-        border: 1px solid var(--border2);
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--text);
-        text-decoration: none;
-        transition: background 0.15s;
-      }
-      .btn-ghost:hover {
-        background: rgba(255, 255, 255, 0.05);
-      }
-      .btn-solid {
-        padding: 7px 16px;
-        background: var(--brand);
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #001e2b;
-        text-decoration: none;
-        transition: opacity 0.15s;
-      }
-      .btn-solid:hover {
-        opacity: 0.88;
-      }
       .page {
         max-width: 760px;
         margin: 0 auto;
@@ -190,9 +137,6 @@
       }
 
       @media (max-width: 600px) {
-        nav {
-          padding: 0 20px;
-        }
         .grid {
           grid-template-columns: 1fr;
         }
@@ -203,17 +147,7 @@
     </style>
   </head>
   <body>
-    <nav>
-      <a href="{{ url_for('landing') }}" class="nav-brand"
-        >Scrum<span>PM</span></a
-      >
-      <div class="nav-actions">
-        <a href="{{ url_for('auth.login') }}" class="btn-ghost">Log in</a>
-        <a href="{{ url_for('auth.register') }}" class="btn-solid"
-          >Get started</a
-        >
-      </div>
-    </nav>
+    {% include '_public_nav.html' %}
     <div class="page">
       <div class="eyebrow">Security</div>
       <h1>Security at ScrumPM</h1>
@@ -222,7 +156,7 @@
       </p>
       <div class="grid">
         <div class="card">
-          <div class="card-icon">🔑</div>
+          <div class="card-icon"></div>
           <h2>Password security</h2>
           <p>
             Passwords are hashed using bcrypt with a unique salt per user. We
@@ -230,7 +164,7 @@
           </p>
         </div>
         <div class="card">
-          <div class="card-icon">🍪</div>
+          <div class="card-icon"></div>
           <h2>Secure sessions</h2>
           <p>
             Session cookies are HTTP-only, SameSite=Lax, and Secure over HTTPS
@@ -238,7 +172,7 @@
           </p>
         </div>
         <div class="card">
-          <div class="card-icon">🏗️</div>
+          <div class="card-icon"></div>
           <h2>Data isolation</h2>
           <p>
             Every project is scoped to its owner via compound indexes. A user
@@ -247,7 +181,7 @@
           </p>
         </div>
         <div class="card">
-          <div class="card-icon">✅</div>
+          <div class="card-icon"></div>
           <h2>Input validation</h2>
           <p>
             All user inputs are validated server-side. Email addresses are
@@ -255,7 +189,7 @@
           </p>
         </div>
         <div class="card">
-          <div class="card-icon">🌐</div>
+          <div class="card-icon"></div>
           <h2>HTTPS everywhere</h2>
           <p>
             All traffic is served over HTTPS. Secure cookie flag is enforced
@@ -263,7 +197,7 @@
           </p>
         </div>
         <div class="card">
-          <div class="card-icon">☁️</div>
+          <div class="card-icon"></div>
           <h2>Cloud infrastructure</h2>
           <p>
             Hosted on secure infrastructure providing encryption at rest and in

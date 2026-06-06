@@ -27,23 +27,6 @@
     }
     html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
-    /* Nav */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px; height: 60px;
-      background: rgba(1,36,51,.88);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .nav-brand { font-size: 18px; font-weight: 800; letter-spacing: -.5px; text-decoration: none; color: var(--text); }
-    .nav-brand span { color: var(--brand); }
-    .nav-actions { display: flex; gap: 10px; }
-    .btn-ghost { padding: 7px 16px; border: 1px solid var(--border2); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; transition: background .15s; }
-    .btn-ghost:hover { background: rgba(255,255,255,.05); }
-    .btn-solid { padding: 7px 16px; background: var(--brand); border-radius: 8px; font-size: 13px; font-weight: 700; color: #001E2B; text-decoration: none; transition: opacity .15s; }
-    .btn-solid:hover { opacity: .88; }
-
     /* Page */
     .page { display: flex; flex-direction: column; align-items: center; padding: 72px 24px 80px; }
     .page-eyebrow {
@@ -104,20 +87,13 @@
     .back-link a:hover { text-decoration: underline; }
 
     @media (max-width: 600px) {
-      nav { padding: 0 20px; }
       .form-card { padding: 28px 20px; }
     }
   </style>
 </head>
 <body>
 
-<nav>
-  <a href="{{ url_for('landing') }}" class="nav-brand">Scrum<span>PM</span></a>
-  <div class="nav-actions">
-    <a href="{{ url_for('auth.login') }}"    class="btn-ghost">Log in</a>
-    <a href="{{ url_for('auth.register') }}" class="btn-solid">Get started</a>
-  </div>
-</nav>
+{% include '_public_nav.html' %}
 
 <div class="page">
   <div class="page-eyebrow">✉ Get in touch</div>

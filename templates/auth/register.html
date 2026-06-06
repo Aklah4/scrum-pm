@@ -368,8 +368,41 @@
         line-height: 1.6;
       }
 
+      /* ── MOBILE TOP BAR ── */
+      .mobile-topbar {
+        display: none;
+        align-items: center;
+        padding: 0 20px;
+        height: 56px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .mob-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text);
+        text-decoration: none;
+        letter-spacing: -0.5px;
+      }
+      .mob-brand .mob-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--brand);
+      }
+      .mob-brand span span { color: var(--brand); }
+
       /* ── RESPONSIVE ── */
       @media (max-width: 768px) {
+        .mobile-topbar {
+          display: flex;
+        }
         .page {
           grid-template-columns: 1fr;
         }
@@ -377,9 +410,8 @@
           display: none;
         }
         .panel-right {
-          padding: 40px 24px;
+          padding: 32px 24px 40px;
           justify-content: flex-start;
-          padding-top: 60px;
         }
         .form-box {
           max-width: 100%;
@@ -388,6 +420,13 @@
     </style>
   </head>
   <body>
+    <!-- ── MOBILE TOP BAR ── -->
+    <div class="mobile-topbar">
+      <a href="{{ url_for('landing') }}" class="mob-brand">
+        <span class="mob-dot"></span><span>Scrum<span>PM</span></span>
+      </a>
+    </div>
+
     <div class="page">
       <!-- ── LEFT PANEL ── -->
       <div class="panel-left">
@@ -518,5 +557,6 @@
         </div>
       </div>
     </div>
+
   </body>
 </html>

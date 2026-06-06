@@ -11,11 +11,6 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--brand:#00ED64;--brand-d:#00684A;--bg:#001E2B;--surface:#012433;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#E8EDEB;--muted:#889397;--font:'Inter',-apple-system,sans-serif}
     html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;background:rgba(1,36,51,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-    .nav-brand{font-size:18px;font-weight:800;letter-spacing:-.5px;text-decoration:none;color:var(--text)}.nav-brand span{color:var(--brand)}
-    .nav-actions{display:flex;gap:10px}
-    .btn-ghost{padding:7px 16px;border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s}.btn-ghost:hover{background:rgba(255,255,255,.05)}
-    .btn-solid{padding:7px 16px;background:var(--brand);border-radius:8px;font-size:13px;font-weight:700;color:#001E2B;text-decoration:none;transition:opacity .15s}.btn-solid:hover{opacity:.88}
     .page{max-width:720px;margin:0 auto;padding:72px 24px 80px}
     .eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;border:1px solid rgba(0,237,100,.3);background:rgba(0,237,100,.08);font-size:12px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:.07em;margin-bottom:20px}
     h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.04em;margin-bottom:8px}
@@ -23,18 +18,10 @@
     h2{font-size:17px;font-weight:700;margin:36px 0 10px}
     p,li{font-size:16px;color:var(--text);line-height:1.75;margin-bottom:12px;opacity:.85}
     ul{padding-left:20px;margin-bottom:10px}
-
-    @media(max-width:600px){nav{padding:0 20px}}
   </style>
 </head>
 <body>
-<nav>
-  <a href="{{ url_for('landing') }}" class="nav-brand">Scrum<span>PM</span></a>
-  <div class="nav-actions">
-    <a href="{{ url_for('auth.login') }}" class="btn-ghost">Log in</a>
-    <a href="{{ url_for('auth.register') }}" class="btn-solid">Get started</a>
-  </div>
-</nav>
+{% include '_public_nav.html' %}
 <div class="page">
   <div class="eyebrow"> Legal</div>
   <h1>Terms of Service</h1>

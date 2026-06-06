@@ -15,6 +15,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     />
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t)})();</script>
     <style>
       *,
       *::before,
@@ -28,16 +29,27 @@
         --brand: #00ed64;
         --brand-d: #00684a;
         --brand-l: rgba(0, 237, 100, 0.12);
+        --bg: #f4f7f5;
+        --surface: #ffffff;
+        --card: #eef2f0;
+        --border: rgba(0,0,0,.08);
+        --border2: rgba(0,0,0,.13);
+        --text: #001e2b;
+        --muted: #5c6c75;
+        --error-bg: rgba(226, 68, 92, 0.1);
+        --error-txt: #c0283f;
+        --font: "Inter", -apple-system, sans-serif;
+      }
+      [data-theme="dark"] {
         --bg: #001e2b;
         --surface: #012433;
         --card: #0a2d3f;
-        --border: rgba(255, 255, 255, 0.08);
-        --border2: rgba(255, 255, 255, 0.14);
+        --border: rgba(255,255,255,.08);
+        --border2: rgba(255,255,255,.14);
         --text: #e8edeb;
         --muted: #889397;
-        --error-bg: rgba(226, 68, 92, 0.12);
+        --error-bg: rgba(226,68,92,.12);
         --error-txt: #ff6b80;
-        --font: "Inter", -apple-system, sans-serif;
       }
 
       html,
@@ -47,6 +59,7 @@
         background: var(--bg);
         color: var(--text);
         -webkit-font-smoothing: antialiased;
+        transition: background .2s, color .2s;
       }
 
       .page {
@@ -361,10 +374,33 @@
         transform: translateY(-1px);
       }
 
+      /* ── FLOATING THEME BUTTON ── */
+      .auth-theme-btn {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 200;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--text);
+        font-size: 14px;
+        transition: background .15s;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      }
+      .auth-theme-btn:hover { background: var(--card); }
+
       /* ── MOBILE TOP BAR ── */
       .mobile-topbar {
         display: none;
         align-items: center;
+        justify-content: space-between;
         padding: 0 20px;
         height: 56px;
         background: var(--surface);
@@ -413,6 +449,9 @@
     </style>
   </head>
   <body>
+    <!-- ── THEME TOGGLE ── -->
+    <button id="authThemeBtn" class="auth-theme-btn" aria-label="Toggle theme">☾</button>
+
     <!-- ── MOBILE TOP BAR ── -->
     <div class="mobile-topbar">
       <a href="{{ url_for('landing') }}" class="mob-brand">
@@ -527,5 +566,20 @@
       </div>
     </div>
 
+    <script>
+    (function(){
+      var btn = document.getElementById('authThemeBtn');
+      function sync(dark){ if(btn) btn.textContent = dark ? '☀' : '☾'; }
+      function toggle(){
+        var dark = document.documentElement.getAttribute('data-theme')==='dark';
+        var next = dark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        sync(!dark);
+      }
+      if(btn) btn.addEventListener('click', toggle);
+      sync(document.documentElement.getAttribute('data-theme')==='dark');
+    })();
+    </script>
   </body>
 </html>

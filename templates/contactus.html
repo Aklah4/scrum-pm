@@ -10,22 +10,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t)})();</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --brand:   #00ED64;
       --brand-d: #00684A;
       --brand-l: rgba(0,237,100,.12);
-      --bg:      #001E2B;
-      --surface: #012433;
-      --card:    #0A2D3F;
-      --border:  rgba(255,255,255,.08);
-      --border2: rgba(255,255,255,.14);
-      --text:    #E8EDEB;
-      --muted:   #889397;
+      --bg:      #f4f7f5;
+      --surface: #ffffff;
+      --card:    #eef2f0;
+      --border:  rgba(0,0,0,.08);
+      --border2: rgba(0,0,0,.13);
+      --text:    #001E2B;
+      --muted:   #5c6c75;
       --font:    'Inter', -apple-system, sans-serif;
     }
-    html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+    [data-theme="dark"] {
+      --bg: #001E2B; --surface: #012433; --card: #0A2D3F;
+      --border: rgba(255,255,255,.08); --border2: rgba(255,255,255,.14);
+      --text: #E8EDEB; --muted: #889397;
+    }
+    html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; transition: background .2s, color .2s; }
 
     /* Page */
     .page { display: flex; flex-direction: column; align-items: center; padding: 72px 24px 80px; }

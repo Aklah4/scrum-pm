@@ -14,6 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     />
     <link rel="canonical" href="https://scrum-pm.up.railway.app/careers" />
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t)})();</script>
     <style>
       *,
       *::before,
@@ -26,14 +27,23 @@
         --brand: #00ed64;
         --brand-d: #00684a;
         --brand-l: rgba(0, 237, 100, 0.12);
+        --bg: #f4f7f5;
+        --surface: #ffffff;
+        --card: #eef2f0;
+        --border: rgba(0,0,0,.08);
+        --border2: rgba(0,0,0,.13);
+        --text: #001e2b;
+        --muted: #5c6c75;
+        --font: "Inter", -apple-system, sans-serif;
+      }
+      [data-theme="dark"] {
         --bg: #001e2b;
         --surface: #012433;
         --card: #0a2d3f;
-        --border: rgba(255, 255, 255, 0.08);
-        --border2: rgba(255, 255, 255, 0.14);
+        --border: rgba(255,255,255,.08);
+        --border2: rgba(255,255,255,.14);
         --text: #e8edeb;
         --muted: #889397;
-        --font: "Inter", -apple-system, sans-serif;
       }
       html,
       body {
@@ -42,6 +52,7 @@
         background: var(--bg);
         color: var(--text);
         -webkit-font-smoothing: antialiased;
+        transition: background .2s, color .2s;
       }
       .page {
         max-width: 760px;

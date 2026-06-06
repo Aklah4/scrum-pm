@@ -1,25 +1,37 @@
 <style>
-.pub-nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;background:rgba(1,36,51,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+body{transition:background .2s,color .2s}
+.pub-nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;transition:background .2s}
+[data-theme="dark"] .pub-nav{background:rgba(1,36,51,.88)}
 .pub-brand{display:flex;align-items:center;gap:7px;font-size:18px;font-weight:800;letter-spacing:-.5px;text-decoration:none;color:var(--text)}
 .pub-brand .pdot{width:7px;height:7px;border-radius:50%;background:var(--brand);display:inline-block;flex-shrink:0}
 .pub-brand .ppm{color:var(--brand)}
 .pub-actions{display:flex;gap:10px;align-items:center}
 .pub-btn-ghost{padding:7px 16px;border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;transition:background .15s}
-.pub-btn-ghost:hover{background:rgba(255,255,255,.05)}
+.pub-btn-ghost:hover{background:rgba(0,0,0,.04)}
+[data-theme="dark"] .pub-btn-ghost:hover{background:rgba(255,255,255,.05)}
 .pub-btn-solid{padding:7px 16px;background:var(--brand);border-radius:8px;font-size:13px;font-weight:700;color:#001e2b;text-decoration:none;transition:opacity .15s}
 .pub-btn-solid:hover{opacity:.88}
+.pub-theme-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border2);border-radius:8px;cursor:pointer;color:var(--text);font-size:14px;transition:background .15s;flex-shrink:0}
+.pub-theme-btn:hover{background:rgba(0,0,0,.04)}
+[data-theme="dark"] .pub-theme-btn:hover{background:rgba(255,255,255,.06)}
 .pub-burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:38px;height:38px;background:none;border:none;cursor:pointer;padding:7px;border-radius:7px;transition:background .15s}
-.pub-burger:hover{background:rgba(255,255,255,.06)}
+.pub-burger:hover{background:rgba(0,0,0,.05)}
+[data-theme="dark"] .pub-burger:hover{background:rgba(255,255,255,.06)}
 .pub-burger .hbl{display:block;width:100%;height:2px;background:var(--text);border-radius:2px;transition:all .22s}
 .pub-burger.is-open .hbl:nth-child(1){transform:translateY(7px) rotate(45deg)}
 .pub-burger.is-open .hbl:nth-child(2){opacity:0;transform:scaleX(0)}
 .pub-burger.is-open .hbl:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.pub-mob{display:none;position:fixed;top:60px;left:0;right:0;background:rgba(0,5,8,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:16px 20px 24px;z-index:99;flex-direction:column;gap:6px}
+.pub-mob{display:none;position:fixed;top:60px;left:0;right:0;background:rgba(248,252,250,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:16px 20px 24px;z-index:99;flex-direction:column;gap:6px;transition:background .2s}
+[data-theme="dark"] .pub-mob{background:rgba(0,5,8,.97)}
 .pub-mob.is-open{display:flex}
 .pub-mob a{display:block;padding:12px 14px;font-size:15px;font-weight:500;color:var(--text);text-decoration:none;border-radius:8px;transition:background .12s}
-.pub-mob a:hover{background:rgba(255,255,255,.06)}
+.pub-mob a:hover{background:rgba(0,0,0,.04)}
+[data-theme="dark"] .pub-mob a:hover{background:rgba(255,255,255,.06)}
 .pub-mob-cta{background:var(--brand)!important;color:#001e2b!important;font-weight:700!important;text-align:center;margin-top:4px}
 .pub-mob-cta:hover{opacity:.88!important;background:var(--brand)!important}
+.pub-mob-theme-btn{display:flex;align-items:center;gap:8px;cursor:pointer;background:none;border:none;width:100%;font-family:inherit;text-align:left;padding:12px 14px;font-size:15px;font-weight:500;color:var(--text);border-radius:8px;transition:background .12s}
+.pub-mob-theme-btn:hover{background:rgba(0,0,0,.04)}
+[data-theme="dark"] .pub-mob-theme-btn:hover{background:rgba(255,255,255,.06)}
 @media(max-width:640px){
   .pub-nav{padding:0 20px}
   .pub-actions{display:none}
@@ -31,6 +43,7 @@
     <span class="pdot"></span><span>Scrum<span class="ppm">PM</span></span>
   </a>
   <div class="pub-actions">
+    <button id="pubTheme" class="pub-theme-btn" aria-label="Toggle theme">☾</button>
     <a href="{{ url_for('auth.login') }}" class="pub-btn-ghost">Log in</a>
     <a href="{{ url_for('auth.register') }}" class="pub-btn-solid">Get started</a>
   </div>
@@ -39,16 +52,33 @@
   </button>
 </nav>
 <div class="pub-mob" id="pubMob">
+  <button class="pub-mob-theme-btn" id="pubThemeMob">☾ Dark mode</button>
   <a href="{{ url_for('auth.login') }}">Log in</a>
   <a href="{{ url_for('auth.register') }}" class="pub-mob-cta">Get started free</a>
 </div>
 <script>
 (function(){
-  var b=document.getElementById('pubBurger'),m=document.getElementById('pubMob');
-  if(!b||!m)return;
-  function close(){m.classList.remove('is-open');b.classList.remove('is-open');b.setAttribute('aria-expanded','false')}
-  b.addEventListener('click',function(e){e.stopPropagation();var o=m.classList.toggle('is-open');b.classList.toggle('is-open',o);b.setAttribute('aria-expanded',o?'true':'false')});
-  document.addEventListener('click',function(e){if(!b.contains(e.target)&&!m.contains(e.target))close()});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+  var burger=document.getElementById('pubBurger'),mob=document.getElementById('pubMob');
+  if(!burger||!mob)return;
+  function closeMenu(){mob.classList.remove('is-open');burger.classList.remove('is-open');burger.setAttribute('aria-expanded','false')}
+  burger.addEventListener('click',function(e){e.stopPropagation();var o=mob.classList.toggle('is-open');burger.classList.toggle('is-open',o);burger.setAttribute('aria-expanded',o?'true':'false')});
+  document.addEventListener('click',function(e){if(!burger.contains(e.target)&&!mob.contains(e.target))closeMenu()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu()});
+  function updateLabel(dark){
+    var d=document.getElementById('pubTheme'),m=document.getElementById('pubThemeMob');
+    if(d)d.textContent=dark?'☀':'☾';
+    if(m)m.textContent=(dark?'☀':'☾')+' '+(dark?'Light mode':'Dark mode');
+  }
+  function doToggle(){
+    var dark=document.documentElement.getAttribute('data-theme')==='dark';
+    var next=dark?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('theme',next);
+    updateLabel(!dark);
+  }
+  var d=document.getElementById('pubTheme'),m=document.getElementById('pubThemeMob');
+  if(d)d.addEventListener('click',doToggle);
+  if(m)m.addEventListener('click',doToggle);
+  updateLabel(document.documentElement.getAttribute('data-theme')==='dark');
 })();
 </script>
